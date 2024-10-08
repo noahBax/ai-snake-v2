@@ -54,6 +54,8 @@ export interface GameKit {
 
 	snakeFront: SnakeNode;
 	snakeBack: SnakeNode;
+	readonly snakeHead: SnakeEnd;
+	readonly snakeTail: SnakeEnd;
 	readonly boardNodes: BoardNode[];
 	readonly boardWidth: number;
 	readonly boardHeight: number;

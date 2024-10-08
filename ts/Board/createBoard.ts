@@ -1,4 +1,4 @@
-import { BoardNode, SnakeEnd, SnakeNode } from "../snakeNodes.js";
+import { BoardNode } from "../snakeNodes.js";
 
 export var EMPTY_NODE: BoardNode = {
 	get north() { return this },
@@ -8,6 +8,7 @@ export var EMPTY_NODE: BoardNode = {
 	board_x: -1,
 	board_y: -1,
 };
+window.emptyNode = EMPTY_NODE;
 
 export default function createBoard(width: number, height: number): BoardNode[] {
 
