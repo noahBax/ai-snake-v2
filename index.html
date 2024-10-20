@@ -8,11 +8,24 @@
 	<style>
 		body {
 			background-color: black;
+			display: flex;
+		}
+		.metrics-panel {
+			margin: 2px;
+		}
+		.metric {
+			color: white;
 		}
 	</style>
 </head>
 <body>
-	
+	<canvas id="gameBoardEle"></canvas>
+	<div class="metrics-panel">
+		<div class="metric">
+			<span>Snake nodes: </span>
+			<span id="numSnakeNodes">2</span>
+		</div>
+	</div>
 	<script src="js/index.js" type="module"></script>
 </body>
 </html>
