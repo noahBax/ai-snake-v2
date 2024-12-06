@@ -1,6 +1,6 @@
 import accessNodeRelation from "./Board/accessNodeRelation.js";
 import findBoardRelation from "./Board/findBoardRelation.js";
-import { currentKit } from "./gamePlayer.js";
+import { snakeSummary } from "./gamePlayer.js";
 import { DIRECTION } from "./snakeNodes.js";
 
 export function initController() {
@@ -11,9 +11,7 @@ export function initController() {
 		if (event.repeat)
 			return;
 		
-		console.log(event.key);
-
-		const currentHeading = findBoardRelation(currentKit.snakeFront.boardSpaceNode, currentKit.snakeHead.boardSpaceNode);
+		const currentHeading = findBoardRelation(snakeSummary.snakeFront.boardSpaceNode, snakeSummary.snakeHead.boardSpaceNode);
 
 		switch (event.key) {
 			case "ArrowUp":
@@ -21,31 +19,31 @@ export function initController() {
 				if (currentHeading == DIRECTION.north || currentHeading == DIRECTION.south)
 					return;
 				
-				currentKit.snakeHead.boardSpaceNode = accessNodeRelation(currentKit.snakeFront.boardSpaceNode, DIRECTION.north);
+				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeFront.boardSpaceNode, DIRECTION.north);
 
-				
+
 			case "ArrowRight":
 
 				if (currentHeading == DIRECTION.east || currentHeading == DIRECTION.west)
 					return;
 				
-				currentKit.snakeHead.boardSpaceNode = accessNodeRelation(currentKit.snakeFront.boardSpaceNode, DIRECTION.east);
+				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeFront.boardSpaceNode, DIRECTION.east);
 
-				
+
 			case "ArrowDown":
 
 				if (currentHeading == DIRECTION.north || currentHeading == DIRECTION.south)
 					return;
 				
-				currentKit.snakeHead.boardSpaceNode = accessNodeRelation(currentKit.snakeFront.boardSpaceNode, DIRECTION.south);
+				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeFront.boardSpaceNode, DIRECTION.south);
 
-				
+
 			case "ArrowLeft":
 
 				if (currentHeading == DIRECTION.east || currentHeading == DIRECTION.west)
 					return;
 				
-				currentKit.snakeHead.boardSpaceNode = accessNodeRelation(currentKit.snakeFront.boardSpaceNode, DIRECTION.west);
+				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeFront.boardSpaceNode, DIRECTION.west);
 
 		}
 	});

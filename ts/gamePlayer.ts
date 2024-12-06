@@ -6,9 +6,9 @@ import { drawSnakeSegment } from "./DrawingTools/drawSnakeSegment.js";
 import initDrawingTools from "./DrawingTools/initDrawingTools.js";
 import { initController } from "./personalController.js";
 import createSnake from "./Snake/createSnake.js";
-import { SnakeEnd, GameKit, BoardNode, SnakeNode } from "./snakeNodes.js";
+import { SnakeEnd, SnakeSummary, BoardNode, SnakeNode } from "./snakeNodes.js";
 
-export var currentKit: GameKit;
+export var snakeSummary: SnakeSummary;
 
 const BOARD_WIDTH  = 20;
 const BOARD_HEIGHT = 20;
@@ -27,7 +27,7 @@ export function init() {
 	while(!isSnakeEnd(snakeBack.tailBoundNode))
 		snakeBack = snakeBack.tailBoundNode;
 
-	currentKit = {
+	snakeSummary = {
 		snakeFront: snake,
 		snakeBack: snakeBack,
 		snakeHead: snake.headBoundNode as SnakeEnd,
@@ -36,7 +36,7 @@ export function init() {
 		boardWidth: BOARD_WIDTH,
 		boardHeight: BOARD_HEIGHT
 	}
-	window.currentKit = currentKit;
+	window.snakeSummary = snakeSummary;
 
 	initDrawingTools(BOARD_WIDTH, BOARD_HEIGHT, DRAW_NODE_SIZE);
 	initController();
@@ -48,7 +48,7 @@ export function init() {
 function tick() {
 
 	// Check to see if head is in wall
-	if (currentKit.snakeHead.boardSpaceNode == EMPTY_NODE) {
+	if (snakeSummary.snakeHead.boardSpaceNode == EMPTY_NODE) {
 		console.log('Game Over');
 		clearInterval(GAME_LOOP);
 		return;
@@ -57,33 +57,33 @@ function tick() {
 	// const snakeHead = currentKit.;
 	// const snakeTail = currentKit.;
 
-	const oldSnakeFront = currentKit.snakeFront as SnakeNode
-	const newSnakeFront = currentKit.snakeBack as SnakeNode;
+	const oldSnakeFront = snakeSummary.snakeFront as SnakeNode
+	const newSnakeFront = snakeSummary.snakeBack as SnakeNode;
 	const newSnakeBack = newSnakeFront.headBoundNode as SnakeNode;
 	
 	// Move snake tail to where back node is
-	currentKit.snakeTail.boardSpaceNode = newSnakeFront.boardSpaceNode;
+	snakeSummary.snakeTail.boardSpaceNode = newSnakeFront.boardSpaceNode;
 	
 	// Move the new snake front to where the head currently is
-	newSnakeFront.boardSpaceNode = currentKit.snakeHead.boardSpaceNode;
+	newSnakeFront.boardSpaceNode = snakeSummary.snakeHead.boardSpaceNode;
 
 	// Move the head node one space further in the direction it is going
 	const relation = findBoardRelation(
 		oldSnakeFront.boardSpaceNode,
-		currentKit.snakeHead.boardSpaceNode
+		snakeSummary.snakeHead.boardSpaceNode
 	);
-	currentKit.snakeHead.boardSpaceNode = accessNodeRelation(currentKit.snakeHead.boardSpaceNode, relation);
+	snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeHead.boardSpaceNode, relation);
 
 
 	// Connect new snakeBack to tail
 	newSnakeBack.tailBoundNode = newSnakeFront.tailBoundNode;
-	currentKit.snakeBack = newSnakeBack
+	snakeSummary.snakeBack = newSnakeBack
 
 	// Connect new snakeFront to front
 	newSnakeFront.tailBoundNode = oldSnakeFront;
 	newSnakeFront.headBoundNode = oldSnakeFront.headBoundNode;
 	oldSnakeFront.headBoundNode = newSnakeFront;
-	currentKit.snakeFront = newSnakeFront;
+	snakeSummary.snakeFront = newSnakeFront;
 
 	// Redraw
 	drawSnake();
@@ -99,7 +99,7 @@ export function drawSnake() {
 	clearGameCanvas();
 
 	// Loop over each snake node and draw it
-	let currentSegment: SnakeEnd | SnakeNode = currentKit.snakeFront;
+	let currentSegment: SnakeEnd | SnakeNode = snakeSummary.snakeFront;
 	while (!isSnakeEnd(currentSegment)) {
 
 		drawSnakeSegment(currentSegment);

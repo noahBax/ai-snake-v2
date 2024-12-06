@@ -1,11 +1,11 @@
-import { BoardNode, GameKit } from "./snakeNodes.js";
+import { BoardNode, SnakeSummary } from "./snakeNodes.js";
 
 export {};
 
 declare global {
 	interface Window { 
 		tick: VoidFunction;
-		currentKit: GameKit;
+		snakeSummary: SnakeSummary;
 		emptyNode: BoardNode;
 	}
 }

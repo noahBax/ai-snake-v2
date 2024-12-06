@@ -50,7 +50,7 @@ export interface BoardNode {
 	readonly board_y: number;
 }
 
-export interface GameKit {
+export interface SnakeSummary {
 
 	snakeFront: SnakeNode;
 	snakeBack: SnakeNode;
