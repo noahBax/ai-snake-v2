@@ -60,3 +60,8 @@ export interface SnakeSummary {
 	readonly boardWidth: number;
 	readonly boardHeight: number;
 }
+
+// Type guard for snake ends because ts is a wimp
+export function isSnakeEnd(node: SnakeNode | SnakeEnd): node is SnakeEnd {
+	return node.isEnd === true;
+}

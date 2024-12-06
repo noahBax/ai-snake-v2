@@ -1,4 +1,5 @@
 import accessNodeRelation from "./Board/accessNodeRelation.js";
+import { drawApple, spawnApple } from "./Board/apple.js";
 import createBoard, { EMPTY_NODE } from "./Board/createBoard.js";
 import findBoardRelation from "./Board/findBoardRelation.js";
 import { clearGameCanvas } from "./DrawingTools/clearGameCanvas.js";
@@ -6,7 +7,7 @@ import { drawSnakeSegment } from "./DrawingTools/drawSnakeSegment.js";
 import initDrawingTools from "./DrawingTools/initDrawingTools.js";
 import { initController } from "./personalController.js";
 import createSnake from "./Snake/createSnake.js";
-import { SnakeEnd, SnakeSummary, BoardNode, SnakeNode } from "./snakeNodes.js";
+import { SnakeEnd, SnakeSummary, BoardNode, SnakeNode, isSnakeEnd } from "./snakeNodes.js";
 
 export var snakeSummary: SnakeSummary;
 
@@ -46,6 +47,9 @@ export function init() {
 
 	initDrawingTools(BOARD_WIDTH, BOARD_HEIGHT, DRAW_NODE_SIZE);
 	initController();
+
+	// Spawn the apple
+	spawnApple(boardNodes, snakeSummary);
 
 	GAME_LOOP = setInterval(tick, 250);
 
@@ -124,9 +128,7 @@ export function drawSnake() {
 
 		currentSegment = currentSegment.tailBoundNode;
 	}
-}
 
-// Type guard for drawSnake
-function isSnakeEnd(node: SnakeNode | SnakeEnd): node is SnakeEnd {
-	return node.isEnd === true;
+	// Draw the apple
+	drawApple();
 }
