@@ -18,20 +18,26 @@ var GAME_LOOP: NodeJS.Timeout;
 
 export function init() {
 
+	// Populate a board and return a list of nodes
 	const boardNodes: BoardNode[] = createBoard(BOARD_WIDTH, BOARD_HEIGHT);
+
+	// Create a template snake. Template is 2 nodes long with 1 head and 1 tail.
+	// This function returns the front of the snake and NOT the head. So it does
+	// have a headBoundNode.
 	const snake = createSnake(boardNodes, BOARD_WIDTH, BOARD_HEIGHT);
 
 	console.log("Snakehead", snake)
 
-	let snakeBack = snake;
-	while(!isSnakeEnd(snakeBack.tailBoundNode))
-		snakeBack = snakeBack.tailBoundNode;
+	// We need to find the tail node that got created in createSnake
+	let snakeTail = snake;
+	while(!isSnakeEnd(snakeTail.tailBoundNode))
+		snakeTail = snakeTail.tailBoundNode;
 
 	snakeSummary = {
 		snakeFront: snake,
-		snakeBack: snakeBack,
+		snakeBack: snakeTail,
 		snakeHead: snake.headBoundNode as SnakeEnd,
-		snakeTail: snakeBack.tailBoundNode,  // How tf does TS pick this up but can't type guard?
+		snakeTail: snakeTail.tailBoundNode,  // How tf does TS pick this up but can't type guard?
 		boardNodes: boardNodes,
 		boardWidth: BOARD_WIDTH,
 		boardHeight: BOARD_HEIGHT
@@ -54,11 +60,13 @@ function tick() {
 		return;
 	}
 
-	// const snakeHead = currentKit.;
-	// const snakeTail = currentKit.;
-
-	const oldSnakeFront = snakeSummary.snakeFront as SnakeNode
-	const newSnakeFront = snakeSummary.snakeBack as SnakeNode;
+	// Move the snake forward by 1. This works by making the current back of the
+	// snake into the front of the snake. It is moved to where the current head
+	// node is. The head node is moved forward 1 in the current heading. The
+	// tail node is moved to the location where the back node used to be 
+	
+	const oldSnakeFront = snakeSummary.snakeFront;
+	const newSnakeFront = snakeSummary.snakeBack;
 	const newSnakeBack = newSnakeFront.headBoundNode as SnakeNode;
 	
 	// Move snake tail to where back node is
@@ -98,8 +106,18 @@ export function drawSnake() {
 	// Clear the canvas of any existing snakes
 	clearGameCanvas();
 
+	// Visualize the ends
+	drawSnakeSegment(snakeSummary.snakeHead, "#00F");
+	drawSnakeSegment(snakeSummary.snakeTail, "#00F");
+	
 	// Loop over each snake node and draw it
 	let currentSegment: SnakeEnd | SnakeNode = snakeSummary.snakeFront;
+	
+	// But first visualize the front
+	drawSnakeSegment(currentSegment, "#FFA500");
+	currentSegment = currentSegment.tailBoundNode;
+	
+	// Loop over all snake segments until the tail node
 	while (!isSnakeEnd(currentSegment)) {
 
 		drawSnakeSegment(currentSegment);

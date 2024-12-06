@@ -45,6 +45,7 @@ export default function createBoard(width: number, height: number): BoardNode[] 
 	return ret;
 }
 
+/* A temporary interface */
 interface EditableBoardNode {
 
 	// How do we get to other nodes

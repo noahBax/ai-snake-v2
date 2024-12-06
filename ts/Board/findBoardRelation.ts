@@ -1,5 +1,6 @@
 import { BoardNode, DIRECTION } from "../snakeNodes.js";
 
+// Determine the orientation that a node2 is to node1
 export default function findBoardRelation(node1: BoardNode, node2: BoardNode): DIRECTION {
 
 	if (node2 == node1.north)

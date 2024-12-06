@@ -11,40 +11,33 @@ export function initController() {
 		if (event.repeat)
 			return;
 		
-		const currentHeading = findBoardRelation(snakeSummary.snakeFront.boardSpaceNode, snakeSummary.snakeHead.boardSpaceNode);
+		const snakeFrontNode = snakeSummary.snakeFront.boardSpaceNode;
+		const currentHeading = findBoardRelation(snakeFrontNode, snakeSummary.snakeHead.boardSpaceNode);
 
 		switch (event.key) {
 			case "ArrowUp":
-
 				if (currentHeading == DIRECTION.north || currentHeading == DIRECTION.south)
-					return;
-				
-				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeFront.boardSpaceNode, DIRECTION.north);
-
+					return;				
+				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeFrontNode, DIRECTION.north);
+				break;
 
 			case "ArrowRight":
-
 				if (currentHeading == DIRECTION.east || currentHeading == DIRECTION.west)
-					return;
-				
-				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeFront.boardSpaceNode, DIRECTION.east);
-
+					return;				
+				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeFrontNode, DIRECTION.east);
+				break;
 
 			case "ArrowDown":
-
 				if (currentHeading == DIRECTION.north || currentHeading == DIRECTION.south)
-					return;
-				
-				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeFront.boardSpaceNode, DIRECTION.south);
-
+					return;				
+				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeFrontNode, DIRECTION.south);
+				break;
 
 			case "ArrowLeft":
-
 				if (currentHeading == DIRECTION.east || currentHeading == DIRECTION.west)
-					return;
-				
-				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeFront.boardSpaceNode, DIRECTION.west);
-
+					return;				
+				snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeFrontNode, DIRECTION.west);
+				break;
 		}
 	});
 }

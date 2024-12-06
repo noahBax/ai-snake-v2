@@ -6,6 +6,7 @@ export var NODE_SIZE: number;
 export var countOfRowNodes: number;
 export var countOfColNodes: number;
 
+// Set some variables by looking at the document
 export default function initDrawingTools(width: number, height: number, nodeSize: number) {
 
 	GAME_BOARD_ELE = document.getElementById(MAIN_BOARD_ID) as HTMLCanvasElement;
