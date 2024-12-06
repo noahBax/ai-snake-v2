@@ -1,5 +1,5 @@
 import accessNodeRelation from "./Board/accessNodeRelation.js";
-import { drawApple, spawnApple } from "./Board/apple.js";
+import { drawApple, goingToEatApple, spawnApple } from "./Board/apple.js";
 import createBoard, { EMPTY_NODE } from "./Board/createBoard.js";
 import findBoardRelation from "./Board/findBoardRelation.js";
 import { clearGameCanvas } from "./DrawingTools/clearGameCanvas.js";
@@ -7,6 +7,8 @@ import { drawSnakeSegment } from "./DrawingTools/drawSnakeSegment.js";
 import initDrawingTools from "./DrawingTools/initDrawingTools.js";
 import { initController } from "./personalController.js";
 import createSnake from "./Snake/createSnake.js";
+import incrementSnake from "./Snake/incrementSnake.js";
+import moveSnake from "./Snake/moveSnake.js";
 import { SnakeEnd, SnakeSummary, BoardNode, SnakeNode, isSnakeEnd } from "./snakeNodes.js";
 
 export var snakeSummary: SnakeSummary;
@@ -49,9 +51,9 @@ export function init() {
 	initController();
 
 	// Spawn the apple
-	spawnApple(boardNodes, snakeSummary);
+	spawnApple(snakeSummary);
 
-	GAME_LOOP = setInterval(tick, 250);
+	GAME_LOOP = setInterval(tick, 125);
 
 }
 
@@ -64,38 +66,13 @@ function tick() {
 		return;
 	}
 
-	// Move the snake forward by 1. This works by making the current back of the
-	// snake into the front of the snake. It is moved to where the current head
-	// node is. The head node is moved forward 1 in the current heading. The
-	// tail node is moved to the location where the back node used to be 
-	
-	const oldSnakeFront = snakeSummary.snakeFront;
-	const newSnakeFront = snakeSummary.snakeBack;
-	const newSnakeBack = newSnakeFront.headBoundNode as SnakeNode;
-	
-	// Move snake tail to where back node is
-	snakeSummary.snakeTail.boardSpaceNode = newSnakeFront.boardSpaceNode;
-	
-	// Move the new snake front to where the head currently is
-	newSnakeFront.boardSpaceNode = snakeSummary.snakeHead.boardSpaceNode;
+	if (goingToEatApple(snakeSummary)) {
+		snakeSummary = incrementSnake(snakeSummary);
+		spawnApple(snakeSummary);
+	} else {
+		snakeSummary = moveSnake(snakeSummary);
+	}
 
-	// Move the head node one space further in the direction it is going
-	const relation = findBoardRelation(
-		oldSnakeFront.boardSpaceNode,
-		snakeSummary.snakeHead.boardSpaceNode
-	);
-	snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeHead.boardSpaceNode, relation);
-
-
-	// Connect new snakeBack to tail
-	newSnakeBack.tailBoundNode = newSnakeFront.tailBoundNode;
-	snakeSummary.snakeBack = newSnakeBack
-
-	// Connect new snakeFront to front
-	newSnakeFront.tailBoundNode = oldSnakeFront;
-	newSnakeFront.headBoundNode = oldSnakeFront.headBoundNode;
-	oldSnakeFront.headBoundNode = newSnakeFront;
-	snakeSummary.snakeFront = newSnakeFront;
 
 	// Redraw
 	drawSnake();

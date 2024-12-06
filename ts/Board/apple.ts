@@ -14,7 +14,7 @@ export default interface Apple {
 /**
  * Spawn an apple on a node not in the snake
  */
-export function spawnApple(boardState: BoardNode[], snakeSummary: SnakeSummary) {
+export function spawnApple(snakeSummary: SnakeSummary) {
 
 	// The list of board nodes are all candidates for the location of the next
 	// apple. First compile a blacklist containing nodes that are in the snake
@@ -36,20 +36,16 @@ export function spawnApple(boardState: BoardNode[], snakeSummary: SnakeSummary) 
 
 	// Now go though the candidates and remove blacklisted nodes
 
-	for (const i in boardState) {
-		const n = boardState[i];
-		for (let j = 0; j < blacklist.length; j++) {
-			const b = blacklist[j];
-			
-			if (n.board_x == b.board_x && n.board_y == b.board_y) {
-				// Don't bother checking this in the future
-				blacklist.splice(j, 1);
-				break;
-			} else {
-				// Valid candidate
-				candidates.push(n);
-			}
-		}
+	for (const i in snakeSummary.boardNodes) {
+		const n = snakeSummary.boardNodes[i];
+
+		let matches = blacklist.some( b => n.board_x == b.board_x && n.board_y == b.board_y);
+
+		// Add it only if it doesn't match
+		if (!matches)
+			candidates.push(n);
+
+
 	}
 	
 	// Pick one of the candidates at random
@@ -72,4 +68,9 @@ export function drawApple() {
 		NODE_SIZE,
 		NODE_SIZE
 	);
+}
+
+export function goingToEatApple(snakeSummary: SnakeSummary): boolean {
+	const head = snakeSummary.snakeHead.boardSpaceNode;
+	return head.board_x == APPLE.board_x && head.board_y == APPLE.board_y;
 }
