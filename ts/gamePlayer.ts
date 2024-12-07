@@ -5,6 +5,7 @@ import { drawSnakeSegment } from "./DrawingTools/drawSnakeSegment.js";
 import initDrawingTools from "./DrawingTools/initDrawingTools.js";
 import { consumeKeyBuffer, initController } from "./personalController.js";
 import createSnake from "./Snake/createSnake.js";
+import goingToEatSelf from "./Snake/goingToEatSelf.js";
 import incrementSnake from "./Snake/incrementSnake.js";
 import moveSnake from "./Snake/moveSnake.js";
 import { SnakeEnd, SnakeSummary, BoardNode, SnakeNode, isSnakeEnd } from "./snakeNodes.js";
@@ -67,6 +68,12 @@ function tick() {
 		return;
 	}
 
+	if (goingToEatSelf(snakeSummary)) {
+		console.log('Game Over');
+		clearInterval(GAME_LOOP);
+		return;
+	}
+	
 	if (goingToEatApple(snakeSummary)) {
 		snakeSummary = incrementSnake(snakeSummary);
 		spawnApple(snakeSummary);
