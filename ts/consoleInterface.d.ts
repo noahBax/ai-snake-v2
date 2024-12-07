@@ -1,4 +1,4 @@
-import { BoardNode, SnakeSummary } from "./snakeNodes.js";
+import { BoardNode, DIRECTION, SnakeSummary } from "./snakeNodes.js";
 
 export {};
 
@@ -7,5 +7,6 @@ declare global {
 		tick: VoidFunction;
 		snakeSummary: SnakeSummary;
 		emptyNode: BoardNode;
+		keysBuffer: DIRECTION[];
 	}
 }

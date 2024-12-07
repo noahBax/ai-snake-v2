@@ -1,17 +1,15 @@
-import accessNodeRelation from "./Board/accessNodeRelation.js";
 import { drawApple, goingToEatApple, spawnApple } from "./Board/apple.js";
 import createBoard, { EMPTY_NODE } from "./Board/createBoard.js";
-import findBoardRelation from "./Board/findBoardRelation.js";
 import { clearGameCanvas } from "./DrawingTools/clearGameCanvas.js";
 import { drawSnakeSegment } from "./DrawingTools/drawSnakeSegment.js";
 import initDrawingTools from "./DrawingTools/initDrawingTools.js";
-import { initController } from "./personalController.js";
+import { consumeKeyBuffer, initController } from "./personalController.js";
 import createSnake from "./Snake/createSnake.js";
 import incrementSnake from "./Snake/incrementSnake.js";
 import moveSnake from "./Snake/moveSnake.js";
 import { SnakeEnd, SnakeSummary, BoardNode, SnakeNode, isSnakeEnd } from "./snakeNodes.js";
 
-export var snakeSummary: SnakeSummary;
+var snakeSummary: SnakeSummary;
 
 const BOARD_WIDTH  = 20;
 const BOARD_HEIGHT = 20;
@@ -58,6 +56,9 @@ export function init() {
 }
 
 function tick() {
+	
+	// Process move
+	consumeKeyBuffer(snakeSummary);
 
 	// Check to see if head is in wall
 	if (snakeSummary.snakeHead.boardSpaceNode == EMPTY_NODE) {
