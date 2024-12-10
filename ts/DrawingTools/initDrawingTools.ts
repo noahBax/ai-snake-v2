@@ -14,6 +14,7 @@ export default function initDrawingTools(width: number, height: number, nodeSize
 	GAME_BOARD_ELE.height = height * nodeSize;
 
 	GAME_BOARD_CTX = GAME_BOARD_ELE.getContext("2d");
+	GAME_BOARD_CTX.imageSmoothingEnabled = false;
 
 	NODE_SIZE = nodeSize;
 	countOfRowNodes = Math.floor(width);
