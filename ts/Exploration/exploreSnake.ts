@@ -36,96 +36,78 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		// Take the highest man off the stack
 		const bestPath = expeditions.reduce((a,b) => {if (a.utility < b.utility) {return a} else {return b}});
 		expeditions.splice(expeditions.indexOf(bestPath), 1);
-		// console.log('utility:', bestPath.utility);
+
+		// Check to see if the path with the best utility has reached the apple
 		if (bestPath.atApple) {
 
+			// And if it is valid
 			if (!checkValidPath(bestPath.snake))
 				continue;
 			
 			winner = bestPath;
 			goalMet = true;
-			// console.log('Found great')
 			break;
 		}
 
-		const pioneers = explore(bestPath, apple);
-		// console.log('expeditions:', expeditions.length);
-		// console.log('Results');
+		const pioneers = expandAtNode(bestPath, apple);
 		for (const p in pioneers) {
-			// console.log(p, ':', pioneers[p]);
 			expeditions.push(pioneers[p]);
 		}
 		
 	}
 
-	// console.log(expeditions);
-
 	return winner;
 }
 
-function explore(expedition: Expedition, apple: Apple): Expedition[] {
+function expandAtNode(expedition: Expedition, apple: Apple): Expedition[] {
 
 	const front = expedition.snake.snakeFront.boardSpaceNode;
-	// console.log(`Exploring at ${front.board_x}, ${front.board_y}`);
 	
-	// Check in all 4 directions to see if there is either
-	// 1) A body part or 
-	// 2) A head
-
-	const checkSelf: BoardNode[] = [
+	const possibleDirections: BoardNode[] = [
 		accessNodeRelation(front, DIRECTION.north),
 		accessNodeRelation(front, DIRECTION.east),
 		accessNodeRelation(front, DIRECTION.south),
 		accessNodeRelation(front, DIRECTION.west),
-	]
-	// console.log(`${checkSelf.length} neighbors`);
+	];
 
-	// // Check if any of them are the apple
-	// for (const n in checkSelf) {
-	// 	if (checkSelf[n].board_x == apple.board_x && checkSelf[n].board_y == apple.board_y) {
-	// 		// Found a path to the apple, return this
-	// 		const f = stepTowards(expedition, checkSelf[n], apple);
-	// 		f.atApple = true;
-	// 		return [f];
-	// 	}
-	// }
-
-	// Or empty node
-	for (let n = 0; n < checkSelf.length; n++) {
-		if (checkSelf[n] == EMPTY_NODE)
-			checkSelf.splice(n, 1);
+	// Eliminate empty nodes
+	for (let n = 0; n < possibleDirections.length; n++) {
+		if (possibleDirections[n] == EMPTY_NODE)
+			possibleDirections.splice(n, 1);
 	}
 
-	// Now loop through the body and eliminate invalid directions
+	// Loop through every node in the body and eliminate a direction if it
+	// overlaps
 	let currentSegment = expedition.snake.snakeFront.tailBoundNode as SnakeNode;
-	while (checkSelf.length > 0) {
+	while (possibleDirections.length > 0) {
 
-		const space = currentSegment.boardSpaceNode;
+		const bodySegmentSpot = currentSegment.boardSpaceNode;
 		
-		// Remove direction possibly
-		for (let n = 0; n < checkSelf.length; n++) {
-			// console.log('positions')
-			// console.log(checkSelf[n].board_x, checkSelf[n].board_y);
-			// console.log(space.board_x, space.board_y);
-			if (checkSelf[n].board_x == space.board_x && checkSelf[n].board_y == space.board_y) {
-				checkSelf.splice(n, 1);
-				// console.log('Spot eliminated');
+		// Check each direction for overlap
+		for (let n = 0; n < possibleDirections.length; n++) {
+
+			const overlapX = possibleDirections[n].board_x == bodySegmentSpot.board_x;
+			const overlapY = possibleDirections[n].board_y == bodySegmentSpot.board_y;
+
+			if (overlapX && overlapY) {
+				possibleDirections.splice(n, 1);
 				break;
 			}
 		}
 
-		// Advance to next segment
+		// If this is the end of the snake, break out
 		if (isSnakeEnd(currentSegment.tailBoundNode))
 			break;
 
-		// Advance to next node
-		currentSegment = currentSegment.tailBoundNode;
+		// Otherwise, advance to next node
+		else
+			currentSegment = currentSegment.tailBoundNode;
 	}
 
 	// The remaining directions are where we should explore
 	const ret: Expedition[] = [];
-	for (const n in checkSelf) {
-		ret.push(stepTowards(expedition, checkSelf[n], apple));
+	for (const n in possibleDirections) {
+		ret.push(stepTowards(expedition, possibleDirections[n], apple));
 	}
 
 	return ret;
@@ -137,7 +119,6 @@ function stepTowards(expedition: Expedition, node: BoardNode, apple: Apple): Exp
 	const snakeFront = snake.snakeFront.boardSpaceNode;
 	
 	// Amend path
-	// console.log('Finding relation between', snakeFront, 'and', node);
 	const relation = findBoardRelation(snakeFront, node);
 	const path = [...expedition.path];
 	path.push(relation);
