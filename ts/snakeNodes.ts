@@ -52,6 +52,7 @@ export interface BoardNode {
 
 export interface SnakeSummary {
 
+	length: number;
 	snakeFront: SnakeNode;
 	snakeBack: SnakeNode;
 	readonly snakeHead: SnakeEnd;
