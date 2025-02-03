@@ -4,6 +4,7 @@ import { clearGameCanvas } from "./DrawingTools/clearGameCanvas.js";
 import { drawSnakeSegment } from "./DrawingTools/drawSnakeSegment.js";
 import initDrawingTools from "./DrawingTools/initDrawingTools.js";
 import { drawApple, drawHead, drawSnakeBody } from "./drawThings.js";
+import Expedition from "./Exploration/expedition.js";
 import exploreSnake from "./Exploration/exploreSnake.js";
 import { consumeKeyBuffer, initController, keysBuffer } from "./personalController.js";
 import createSnake from "./Snake/createSnake.js";
@@ -69,12 +70,7 @@ export function init() {
 
 	// Determine path
 	const e = exploreSnake(snakeSummary, appleNow);
-	console.log(e);
-	if (e != undefined) {
-		for (const m in e.path) {
-			keysBuffer.push(e.path[m]);
-		}
-	}
+	getPathFromExpedition(e);
 
 	// GAME_LOOP = setInterval(tick, 125);
 	requestAnimationFrame(tick);
@@ -122,13 +118,7 @@ function tick() {
 		
 		// Determine path
 		const e = exploreSnake(snakeSummary, appleNow);
-		console.log(e);
-		if (e != undefined) {
-			for (const m in e.path) {
-				keysBuffer.unshift(e.path[m]);
-			}
-			console.log(`Found a path: ${keysBuffer.join(', ')}`);
-		}
+		getPathFromExpedition(e);
 	} else {
 		snakeSummary = moveSnake(snakeSummary);
 	}
@@ -169,4 +159,14 @@ export function drawSnake() {
 
 	// Draw the apple
 	drawApple(appleNow);
+}
+
+function getPathFromExpedition(e: Expedition): void {
+	console.log(e);
+	if (e != undefined) {
+		for (const m in e.path) {
+			keysBuffer.unshift(e.path[m]);
+		}
+		console.log(`Found a path: ${keysBuffer.join(', ')}`);
+	}
 }
