@@ -1,10 +1,11 @@
 import { GAME_BOARD_CTX, NODE_SIZE } from "../DrawingTools/initDrawingTools.js";
+import { SHEET } from "../sheet.js";
 import { BoardNode, isSnakeEnd, SnakeSummary } from "../snakeNodes.js";
 
-export var APPLE: Apple = {
-	board_x: 0,
-	board_y: 0
-};
+// export var APPLE: Apple = {
+// 	board_x: 0,
+// 	board_y: 0
+// };
 
 export default interface Apple {
 	board_x: number;
@@ -13,8 +14,11 @@ export default interface Apple {
 
 /**
  * Spawn an apple on a node not in the snake
+ * @param snakeSummary Summary of the snake to avoid
+ * @param apple The apple to relocate
+ * @param antiApple An optional apple to avoid placing over
  */
-export function spawnApple(snakeSummary: SnakeSummary) {
+export function spawnApple(snakeSummary: SnakeSummary, apple: Apple, antiApple?: Apple) {
 
 	// The list of board nodes are all candidates for the location of the next
 	// apple. First compile a blacklist containing nodes that are in the snake
@@ -47,30 +51,21 @@ export function spawnApple(snakeSummary: SnakeSummary) {
 
 
 	}
-	
+
 	// Pick one of the candidates at random
-	const bigApple = Math.floor(Math.random() * candidates.length);
+	let bigApple = Math.floor(Math.random() * candidates.length);
+
+	// If there is an apple that we shouldn't place over, pick over that
+	if (antiApple && antiApple.board_x == candidates[bigApple].board_x && antiApple.board_y == candidates[bigApple].board_y) {
+		bigApple = bigApple + 1 % candidates.length;
+	}
 
 	// Set the properties of APPLE
-	APPLE.board_x = candidates[bigApple].board_x;
-	APPLE.board_y = candidates[bigApple].board_y;
+	apple.board_x = candidates[bigApple].board_x;
+	apple.board_y = candidates[bigApple].board_y;
 }
 
-export function drawApple() {
-	GAME_BOARD_CTX.fillStyle = "#0F0";
-
-	const drawX = APPLE.board_x;
-	const drawY = APPLE.board_y;
-
-	GAME_BOARD_CTX.fillRect(
-		drawX * NODE_SIZE,
-		drawY * NODE_SIZE,
-		NODE_SIZE,
-		NODE_SIZE
-	);
-}
-
-export function goingToEatApple(snakeSummary: SnakeSummary): boolean {
+export function goingToEatApple(snakeSummary: SnakeSummary, apple: Apple): boolean {
 	const head = snakeSummary.snakeHead.boardSpaceNode;
-	return head.board_x == APPLE.board_x && head.board_y == APPLE.board_y;
+	return head.board_x == apple.board_x && head.board_y == apple.board_y;
 }

@@ -2,7 +2,7 @@ import { SnakeNode, SnakeEnd, BoardNode } from "../snakeNodes.js";
 
 export default function createSnake(boardNodes: BoardNode[], boardWidth: number, boardHeight: number): SnakeNode {
 	
-	// Default to the spot at 5,5
+	// Default to the spot at 4,4
 	const snakeHead: SnakeEnd = {
 		boardSpaceNode: boardNodes[5 + 4 * boardWidth],
 		isEnd: true
