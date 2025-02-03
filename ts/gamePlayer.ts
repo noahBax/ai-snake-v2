@@ -5,7 +5,9 @@ import initDrawingTools from "./DrawingTools/initDrawingTools.js";
 import { snakeDrawBuffer } from "./DrawingTools/snakeDrawBuffer.js";
 import Expedition from "./Exploration/expedition.js";
 import exploreSnake from "./Exploration/exploreSnake.js";
+import getPathFromExpedition from "./Exploration/getPathFromExpedition.js";
 import { consumeKeyBuffer, initController, keysBuffer } from "./personalController.js";
+import { BOARD_WIDTH, BOARD_HEIGHT, DRAW_NODE_SIZE } from "./preferences.js";
 import createSnake from "./Snake/createSnake.js";
 import createSnakeCopy from "./Snake/createSnakeCopy.js";
 import goingToEatSelf from "./Snake/goingToEatSelf.js";
@@ -15,9 +17,6 @@ import { SnakeEnd, SnakeSummary, BoardNode, isSnakeEnd } from "./snakeNodes.js";
 
 var snakeSummary: SnakeSummary;
 
-const BOARD_WIDTH  = 10;
-const BOARD_HEIGHT = 10;
-const DRAW_NODE_SIZE = 40;
 var appleNow: Apple = {
 	board_x: 0,
 	board_y: 0
@@ -73,7 +72,7 @@ export function init() {
 
 	// Determine path
 	const e = exploreSnake(snakeSummary, appleNow);
-	getPathFromExpedition(e);
+	getPathFromExpedition(e, keysBuffer);
 
 	// GAME_LOOP = setInterval(tick, 125);
 	unlock_tick();
@@ -122,7 +121,7 @@ export async function snakeTickFunction() {
 		
 		// Determine path
 		const e = exploreSnake(snakeSummary, appleNow);
-		getPathFromExpedition(e);
+		getPathFromExpedition(e, keysBuffer);
 	} else {
 		snakeSummary = moveSnake(snakeSummary);
 	}
@@ -135,12 +134,3 @@ export async function snakeTickFunction() {
 window.tick = snakeTickFunction;
 
 
-function getPathFromExpedition(e: Expedition): void {
-	console.log(e);
-	if (e != undefined) {
-		for (const m in e.path) {
-			keysBuffer.unshift(e.path[m]);
-		}
-		console.log(`Found a path: ${keysBuffer.join(', ')}`);
-	}
-}

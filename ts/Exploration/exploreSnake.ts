@@ -10,6 +10,7 @@ import { EMPTY_NODE } from "../Board/createBoard.js";
 import frontCanSeeSnakeTail from "./Rules/frontCanSeeSnakeTail.js";
 import tailNotSnakeFrontNeighbor from "./Rules/tailNotSnakeFrontNeighbor.js";
 import { snakeDrawBuffer } from "../DrawingTools/snakeDrawBuffer.js";
+import { isDuplicate, CompassNode } from "./duplicateFinder.js";
 
 export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): Expedition {
 	
@@ -26,6 +27,7 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		atApple: false,
 	}
 	expeditions.push(empty);
+	const duplicateBoard: CompassNode[] = [];
 	
 	let limit = 20000;
 	while (!goalMet && limit > 0) {
@@ -39,12 +41,19 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		const bestPath = expeditions.reduce((a,b) => {if (a.utility < b.utility) {return a} else {return b}});
 		expeditions.splice(expeditions.indexOf(bestPath), 1);
 
+		// Check to see if it is a duplicate
+		if (isDuplicate(duplicateBoard, bestPath)) {
+			console.log('duped');
+			continue;
+		}
+
 		// Check to see if the path with the best utility has reached the apple
 		if (bestPath.atApple) {
 
+
 			// Check to see that it passes all of the rules
 			if (!checkMeetsRules(bestPath)) {
-				snakeDrawBuffer.push([bestPath.snake, {...apple}]);
+				// snakeDrawBuffer.push([bestPath.snake, {...apple}]);
 				continue;
 			}
 			
