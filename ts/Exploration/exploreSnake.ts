@@ -8,6 +8,8 @@ import * as utility from "../utilityFunctions/utilityFunctions.js";
 import moveSnake from "../Snake/moveSnake.js";
 import { EMPTY_NODE } from "../Board/createBoard.js";
 import frontCanSeeSnakeTail from "./Rules/frontCanSeeSnakeTail.js";
+import tailNotSnakeFrontNeighbor from "./Rules/tailNotSnakeFrontNeighbor.js";
+import { snakeDrawBuffer } from "../DrawingTools/snakeDrawBuffer.js";
 
 export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): Expedition {
 	
@@ -41,8 +43,10 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		if (bestPath.atApple) {
 
 			// Check to see that it passes all of the rules
-			if (!checkMeetsRules(bestPath))
+			if (!checkMeetsRules(bestPath)) {
+				snakeDrawBuffer.push([bestPath.snake, {...apple}]);
 				continue;
+			}
 			
 			winner = bestPath;
 			goalMet = true;
@@ -142,7 +146,8 @@ function stepTowards(expedition: Expedition, node: BoardNode, apple: Apple): Exp
 
 function checkMeetsRules(e: Expedition) {
 	const rules: ((e: Expedition) => boolean)[] = [
-		frontCanSeeSnakeTail
+		frontCanSeeSnakeTail,
+		tailNotSnakeFrontNeighbor,
 	];
 
 	return rules.every( r => r(e));

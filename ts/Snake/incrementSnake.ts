@@ -25,5 +25,8 @@ export default function incrementSnake(snakeSummary: SnakeSummary): SnakeSummary
 	);
 	snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeHead.boardSpaceNode, relation);
 
+	// Increase the length metric
+	snakeSummary.length++;
+
 	return snakeSummary;
 }

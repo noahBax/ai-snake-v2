@@ -1,8 +1,9 @@
-import { drawSnake, init } from "./gamePlayer.js";
+import { frameHandler } from "./DrawingTools/frameManager.js";
+import { init } from "./gamePlayer.js";
 
 function main() {
 	init();
-	// drawSnake();
+	frameHandler(0);
 }
 
 main();

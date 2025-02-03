@@ -1,3 +1,4 @@
+import Apple from "./Board/apple.js";
 import { BoardNode, DIRECTION, SnakeSummary } from "./snakeNodes.js";
 
 export {};
@@ -8,5 +9,6 @@ declare global {
 		snakeSummary: SnakeSummary;
 		emptyNode: BoardNode;
 		keysBuffer: DIRECTION[];
+		snakeDrawBuffer: [SnakeSummary, Apple][]; 
 	}
 }

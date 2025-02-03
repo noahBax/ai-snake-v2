@@ -1,17 +1,17 @@
 import Apple, { goingToEatApple, spawnApple } from "./Board/apple.js";
 import createBoard, { EMPTY_NODE } from "./Board/createBoard.js";
-import { clearGameCanvas } from "./DrawingTools/clearGameCanvas.js";
-import { drawSnakeSegment } from "./DrawingTools/drawSnakeSegment.js";
+import { unlock_tick } from "./DrawingTools/frameLocks.js";
 import initDrawingTools from "./DrawingTools/initDrawingTools.js";
-import { drawApple, drawHead, drawSnakeBody } from "./drawThings.js";
+import { snakeDrawBuffer } from "./DrawingTools/snakeDrawBuffer.js";
 import Expedition from "./Exploration/expedition.js";
 import exploreSnake from "./Exploration/exploreSnake.js";
 import { consumeKeyBuffer, initController, keysBuffer } from "./personalController.js";
 import createSnake from "./Snake/createSnake.js";
+import createSnakeCopy from "./Snake/createSnakeCopy.js";
 import goingToEatSelf from "./Snake/goingToEatSelf.js";
 import incrementSnake from "./Snake/incrementSnake.js";
 import moveSnake from "./Snake/moveSnake.js";
-import { SnakeEnd, SnakeSummary, BoardNode, SnakeNode, isSnakeEnd } from "./snakeNodes.js";
+import { SnakeEnd, SnakeSummary, BoardNode, isSnakeEnd } from "./snakeNodes.js";
 
 var snakeSummary: SnakeSummary;
 
@@ -49,6 +49,7 @@ export function init() {
 		snakeTail = snakeTail.tailBoundNode;
 
 	snakeSummary = {
+		length: 2,
 		snakeFront: snake,
 		snakeBack: snakeTail,
 		snakeHead: snake.headBoundNode as SnakeEnd,
@@ -58,6 +59,8 @@ export function init() {
 		boardHeight: BOARD_HEIGHT
 	}
 	window.snakeSummary = snakeSummary;
+
+	window.snakeDrawBuffer = snakeDrawBuffer;
 
 	initDrawingTools(BOARD_WIDTH, BOARD_HEIGHT, DRAW_NODE_SIZE);
 	initController();
@@ -73,16 +76,17 @@ export function init() {
 	getPathFromExpedition(e);
 
 	// GAME_LOOP = setInterval(tick, 125);
-	requestAnimationFrame(tick);
+	unlock_tick();
+	// requestAnimationFrame(snakeTickFunction);
 
 }
 
-function tick() {
+export async function snakeTickFunction() {
 
 	if (keysBuffer.length == 0) {
 		console.log('Key buffer empty, Game Over');
 		// clearInterval(GAME_LOOP);
-		drawSnake();
+		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}]);
 		return;
 	}
 	
@@ -93,14 +97,14 @@ function tick() {
 	if (snakeSummary.snakeHead.boardSpaceNode == EMPTY_NODE) {
 		console.log('Hit wall, Game Over');
 		// clearInterval(GAME_LOOP);
-		drawSnake();
+		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}]);
 		return;
 	}
 	
 	if (goingToEatSelf(snakeSummary)) {
 		console.log('Ate self, Game Over');
 		// clearInterval(GAME_LOOP);
-		drawSnake();
+		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}]);
 		return;
 	}
 	
@@ -108,7 +112,7 @@ function tick() {
 	if (goingToEatApple(snakeSummary, appleNow)) {
 		snakeSummary = incrementSnake(snakeSummary);
 		spawnApple(snakeSummary, appleNow);
-		drawSnake();
+		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}]);
 		
 		if (keysBuffer.length != 0) {
 			console.log('More than one key left, Game Over');
@@ -123,43 +127,13 @@ function tick() {
 		snakeSummary = moveSnake(snakeSummary);
 	}
 
-
 	// Redraw
-	drawSnake();
-	requestAnimationFrame(tick);
+	snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}]);
+	unlock_tick();
 }
 
-window.tick = tick;
+window.tick = snakeTickFunction;
 
-
-export function drawSnake() {
-
-	// Clear the canvas of any existing snakes
-	clearGameCanvas();
-
-	// // Visualize the ends
-	// drawSnakeSegment(snakeSummary.snakeHead, "#00F");
-	// drawSnakeSegment(snakeSummary.snakeTail, "#00F");
-	
-	// Loop over each snake node and draw it
-	
-	// But first visualize the front
-	// drawSnakeSegment(currentSegment, "#FFA500");
-	// currentSegment = currentSegment.tailBoundNode;
-	
-	// // Loop over all snake segments until the tail node
-	// while (!isSnakeEnd(currentSegment)) {
-
-	// 	drawSnakeSegment(currentSegment);
-
-	// 	currentSegment = currentSegment.tailBoundNode;
-	// }
-	drawSnakeBody(snakeSummary);
-	drawHead(snakeSummary);
-
-	// Draw the apple
-	drawApple(appleNow);
-}
 
 function getPathFromExpedition(e: Expedition): void {
 	console.log(e);

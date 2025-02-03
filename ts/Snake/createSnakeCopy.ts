@@ -45,6 +45,7 @@ export default function createSnakeCopy(snakeSummary: SnakeSummary): SnakeSummar
 	}
 
 	return {
+		length: snakeSummary.length,
 		snakeFront: snakeFront,
 		snakeBack: snakeBack,
 		snakeHead: snakeHead,
