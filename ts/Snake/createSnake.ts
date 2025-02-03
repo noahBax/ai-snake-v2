@@ -1,32 +1,48 @@
-import { SnakeNode, SnakeEnd, BoardNode } from "../snakeNodes.js";
+import accessNodeRelation from "../Board/accessNodeRelation.js";
+import { BOARD_WIDTH, BOARD_HEIGHT } from "../preferences.js";
+import { SnakeNode, SnakeEnd, BoardNode, SnakeSummary, DIRECTION } from "../snakeNodes.js";
 
-export default function createSnake(boardNodes: BoardNode[], boardWidth: number, boardHeight: number): SnakeNode {
+export default function createSnake(boardNodes: BoardNode[]): SnakeSummary {
 	
-	// Default to the spot at 4,4
+	// Start at spot (5, 4)
+	const seg0: BoardNode = boardNodes[5 + 4 * BOARD_WIDTH];
+	const seg1: BoardNode = accessNodeRelation(seg0, DIRECTION.west);
+	const seg2: BoardNode = accessNodeRelation(seg1, DIRECTION.west);
+	const seg3: BoardNode = accessNodeRelation(seg2, DIRECTION.west);
+	
 	const snakeHead: SnakeEnd = {
-		boardSpaceNode: boardNodes[5 + 4 * boardWidth],
+		boardSpaceNode: seg0,
 		isEnd: true
 	}
 	
-	// Spot at 2,5
 	const snakeTail: SnakeEnd = {
-		boardSpaceNode: boardNodes[2 + 4 * boardWidth],
+		boardSpaceNode: seg3,
 		isEnd: true
 	}
 
-	const snakeSegment1: SnakeNode = {
+	const snakeFront: SnakeNode = {
 		headBoundNode: snakeHead,
 		tailBoundNode: snakeHead,  // Temporary
-		boardSpaceNode: boardNodes[4 + 4 * boardWidth],	// Spot at 3,4
+		boardSpaceNode: seg1,
 		isEnd: false
 	}
-	const snakeSegment2: SnakeNode = {
-		headBoundNode: snakeSegment1,
+	const snakeBack: SnakeNode = {
+		headBoundNode: snakeFront,
 		tailBoundNode: snakeTail,
-		boardSpaceNode: boardNodes[3 + 4 * boardWidth],	// Spot at 3,4
+		boardSpaceNode: seg2,
 		isEnd: false
 	}
-	snakeSegment1.tailBoundNode = snakeSegment2;
+	snakeFront.tailBoundNode = snakeBack;
 
-	return snakeSegment1;
+	return {
+		length: 2,
+		snakeFront: snakeFront,
+		snakeBack: snakeBack,
+		snakeHead: snakeHead,
+		snakeTail: snakeTail,
+		boardNodes: boardNodes,
+		boardWidth: BOARD_WIDTH,
+		boardHeight: BOARD_HEIGHT
+	}
+
 }

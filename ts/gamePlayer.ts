@@ -26,6 +26,7 @@ var appleSoon: Apple = {
 	board_y: 0
 };
 
+const gameRunning: HTMLSpanElement = document.getElementById('gameRunning');
 export var spriteSheetImage: HTMLImageElement;
 
 export function init() {
@@ -38,25 +39,10 @@ export function init() {
 	// Create a template snake. Template is 2 nodes long with 1 head and 1 tail.
 	// This function returns the front of the snake and NOT the head. So it does
 	// have a headBoundNode.
-	const snake = createSnake(boardNodes, BOARD_WIDTH, BOARD_HEIGHT);
+	snakeSummary = createSnake(boardNodes);
 
-	console.log("Snakehead", snake)
+	console.log("Snakehead", snakeSummary.snakeHead);
 
-	// We need to find the tail node that got created in createSnake
-	let snakeTail = snake;
-	while(!isSnakeEnd(snakeTail.tailBoundNode))
-		snakeTail = snakeTail.tailBoundNode;
-
-	snakeSummary = {
-		length: 2,
-		snakeFront: snake,
-		snakeBack: snakeTail,
-		snakeHead: snake.headBoundNode as SnakeEnd,
-		snakeTail: snakeTail.tailBoundNode,  // How tf does TS pick this up but can't type guard?
-		boardNodes: boardNodes,
-		boardWidth: BOARD_WIDTH,
-		boardHeight: BOARD_HEIGHT
-	}
 	window.snakeSummary = snakeSummary;
 
 	window.snakeDrawBuffer = snakeDrawBuffer;
@@ -84,8 +70,9 @@ export async function snakeTickFunction() {
 
 	if (keysBuffer.length == 0) {
 		console.log('Key buffer empty, Game Over');
+		gameRunning.innerText = 'false';
 		// clearInterval(GAME_LOOP);
-		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}]);
+		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
 		return;
 	}
 	
@@ -96,14 +83,16 @@ export async function snakeTickFunction() {
 	if (snakeSummary.snakeHead.boardSpaceNode == EMPTY_NODE) {
 		console.log('Hit wall, Game Over');
 		// clearInterval(GAME_LOOP);
-		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}]);
+		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
+		gameRunning.innerText = 'false';
 		return;
 	}
 	
 	if (goingToEatSelf(snakeSummary)) {
 		console.log('Ate self, Game Over');
 		// clearInterval(GAME_LOOP);
-		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}]);
+		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
+		gameRunning.innerText = 'false';
 		return;
 	}
 	
@@ -111,10 +100,11 @@ export async function snakeTickFunction() {
 	if (goingToEatApple(snakeSummary, appleNow)) {
 		snakeSummary = incrementSnake(snakeSummary);
 		spawnApple(snakeSummary, appleNow);
-		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}]);
+		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
 		
 		if (keysBuffer.length != 0) {
 			console.log('More than one key left, Game Over');
+			gameRunning.innerText = 'false';
 			// clearInterval(GAME_LOOP);
 			return;
 		}
@@ -127,7 +117,7 @@ export async function snakeTickFunction() {
 	}
 
 	// Redraw
-	snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}]);
+	snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
 	unlock_tick();
 }
 
