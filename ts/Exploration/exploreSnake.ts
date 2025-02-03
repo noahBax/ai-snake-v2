@@ -7,7 +7,7 @@ import Expedition from "./expedition.js";
 import * as utility from "../utilityFunctions/utilityFunctions.js";
 import moveSnake from "../Snake/moveSnake.js";
 import { EMPTY_NODE } from "../Board/createBoard.js";
-import checkValidPath from "../Board/checkValidPath.js";
+import frontCanSeeSnakeTail from "./Rules/frontCanSeeSnakeTail.js";
 
 export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): Expedition {
 	
@@ -40,8 +40,8 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		// Check to see if the path with the best utility has reached the apple
 		if (bestPath.atApple) {
 
-			// And if it is valid
-			if (!checkValidPath(bestPath.snake))
+			// Check to see that it passes all of the rules
+			if (!checkMeetsRules(bestPath))
 				continue;
 			
 			winner = bestPath;
@@ -138,4 +138,12 @@ function stepTowards(expedition: Expedition, node: BoardNode, apple: Apple): Exp
 		utility: u,
 		atApple: atApple
 	};
+}
+
+function checkMeetsRules(e: Expedition) {
+	const rules: ((e: Expedition) => boolean)[] = [
+		frontCanSeeSnakeTail
+	];
+
+	return rules.every( r => r(e));
 }
