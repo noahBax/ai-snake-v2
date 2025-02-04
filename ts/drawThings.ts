@@ -2,7 +2,7 @@ import Apple from "./Board/apple.js";
 import boardToCoord from "./Board/boardToCoord.js";
 import findBoardRelation from "./Board/findBoardRelation.js";
 import { GAME_BOARD_CTX, NODE_SIZE } from "./DrawingTools/initDrawingTools.js";
-import { spriteSheetImage, spriteSheetExploringImage} from "./gamePlayer.js";
+import { spriteSheetImage, spriteSheetExploringImage, spriteSheetBadImage} from "./gamePlayer.js";
 import { SHEET, sprites } from "./sheet.js";
 import { isSnakeEnd, SnakeNode, SnakeSummary } from "./snakeNodes.js";
 
@@ -20,7 +20,7 @@ export function drawApple(apple: Apple): void {
 	GAME_BOARD_CTX.drawImage(spriteSheetImage, ...s, ...d);
 }
 
-export function drawHead(snakeSummary: SnakeSummary, isExploring=false): void {
+export function drawHead(snakeSummary: SnakeSummary, comment: number): void {
 	const front = snakeSummary.snakeFront
 	const dir = findBoardRelation(front.boardSpaceNode, front.tailBoundNode.boardSpaceNode);
 	// const directionArray: sprites[] = ["up", "left", "down", "right"];
@@ -35,14 +35,16 @@ export function drawHead(snakeSummary: SnakeSummary, isExploring=false): void {
 	s = [SHEET[sprite].x, SHEET[sprite].y, 10, 10];
 	d = [drawX * NODE_SIZE, drawY * NODE_SIZE, NODE_SIZE, NODE_SIZE];
 	
-	if (!isExploring)
+	if (comment == 0)
 		GAME_BOARD_CTX.drawImage(spriteSheetImage, ...s, ...d);
+	else if(comment > 0)
+		GAME_BOARD_CTX.drawImage(spriteSheetBadImage, ...s, ...d);
 	else
 		GAME_BOARD_CTX.drawImage(spriteSheetExploringImage, ...s, ...d);
 
 }
 
-export function drawDead(snakeSummary: SnakeSummary, isExploring=false): void {
+export function drawDead(snakeSummary: SnakeSummary, comment: number): void {
 	const front = snakeSummary.snakeFront
 	const dir = findBoardRelation(front.boardSpaceNode, front.tailBoundNode.boardSpaceNode);
 	// const directionArray: sprites[] = ["up", "left", "down", "right"];
@@ -57,17 +59,20 @@ export function drawDead(snakeSummary: SnakeSummary, isExploring=false): void {
 	s = [SHEET[sprite].x, SHEET[sprite].y, 10, 10];
 	d = [drawX * NODE_SIZE, drawY * NODE_SIZE, NODE_SIZE, NODE_SIZE];
 	
-	if (!isExploring)
+	if (comment == 0)
 		GAME_BOARD_CTX.drawImage(spriteSheetImage, ...s, ...d);
+	else if(comment > 0)
+		GAME_BOARD_CTX.drawImage(spriteSheetBadImage, ...s, ...d);
 	else
 		GAME_BOARD_CTX.drawImage(spriteSheetExploringImage, ...s, ...d);
-
 }
 
-export function drawSnakeBody(snakeSummary: SnakeSummary, isExploring=false): void {
+export function drawSnakeBody(snakeSummary: SnakeSummary, comment: number): void {
 	// Draw and move the snake
-	if (!isExploring)
+	if (comment == 0)
 		GAME_BOARD_CTX.strokeStyle = "#00FF00";
+	else if (comment > 0)
+		GAME_BOARD_CTX.strokeStyle = "rgb(127, 0, 0)";
 	else
 		GAME_BOARD_CTX.strokeStyle = "rgb(0, 51, 255";
 	GAME_BOARD_CTX.lineWidth = NODE_SIZE / 2;

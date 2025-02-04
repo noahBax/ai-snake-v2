@@ -10,16 +10,22 @@ var frameSkipCount = 0;
 var waitFrames = frameSkipCount;
 var frameBufferIndex = 0;
 export function lowerIndex() {
-	frameBufferIndex--;
+	frameBufferIndex = Math.max(0, frameBufferIndex - 1);
 }
 export function upperIndex() {
-	frameBufferIndex++;
+	frameBufferIndex = Math.min(frameBufferIndex + 1, snakeDrawBuffer.length);
 }
 
 const commentEle: HTMLSpanElement = document.getElementById('frameComment');
 
+export function initFrameManager(): void {
+	window.frameBufferIndex = frameBufferIndex;
+}
+
 export function frameHandler(ts: number): void {
 
+	window.frameBufferIndex = frameBufferIndex;
+	
 	if (waitFrames > 0) {
 		waitFrames--;
 		requestAnimationFrame(frameHandler);
@@ -37,7 +43,8 @@ export function frameHandler(ts: number): void {
 		}
 		// if (frame[2])
 		// 	waitFrames += frameSkipCount * 30;
-		// commentEle.textContent = '' + frame[2];
+		commentEle.textContent = '' + frame[2];
+		// drawSnake(frame[0].snake, frame[1], frame[2]);
 		drawSnake(...frame);
 		// lock_tick();
 
@@ -50,13 +57,13 @@ export function frameHandler(ts: number): void {
 	requestAnimationFrame(frameHandler);
 }
 
-function drawSnake(snakeSummary: SnakeSummary, apple: Apple, c: number) {
+function drawSnake(snakeSummary: SnakeSummary, apple: Apple, c: number, _?) {
 
 	// Clear the canvas of any existing snakes
 	clearGameCanvas();
 
-	drawSnakeBody(snakeSummary, c == -1);
-	drawHead(snakeSummary, c == -1);
+	drawSnakeBody(snakeSummary, c);
+	drawHead(snakeSummary, c);
 
 	// Draw the apple
 	drawApple(apple);
