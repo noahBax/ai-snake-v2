@@ -7,6 +7,5 @@ export default function getPathFromExpedition(e: Expedition, keysBuffer: DIRECTI
 		for (const m in e.path) {
 			keysBuffer.unshift(e.path[m]);
 		}
-		// console.log(`Found a path: ${keysBuffer.join(', ')}`);
 	}
 }

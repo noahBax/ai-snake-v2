@@ -1,5 +1,7 @@
 import accessNodeRelation from "./Board/accessNodeRelation.js";
 import findBoardRelation from "./Board/findBoardRelation.js";
+import { unlock_tick } from "./DrawingTools/frameLocks.js";
+import { lowerIndex } from "./DrawingTools/frameManager.js";
 import { DIRECTION, SnakeSummary } from "./snakeNodes.js";
 
 export const keysBuffer: DIRECTION[] = [];
@@ -36,8 +38,8 @@ export function consumeKeyBuffer(snakeSummary: SnakeSummary): void {
 	const snakeNeckNode = snakeSummary.snakeFront.tailBoundNode.boardSpaceNode;
 	const currentHeading = findBoardRelation(snakeNeckNode, snakeFrontNode);
 	const key = keysBuffer.pop();
-	console.log('Consumed key:', key);
-	snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeFrontNode, key);
+	// console.log('Consumed key:', key);
+	// snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeFrontNode, key);
 	let valid = false;
 
 	switch (key) {
@@ -80,6 +82,15 @@ export function initController() {
 
 			case "ArrowLeft":
 				keysBuffer.unshift(DIRECTION.west);
+				break;
+
+			case " ":
+				unlock_tick();
+				console.log('unlocksing');
+				break;
+			
+			case "a":
+				lowerIndex();
 				break;
 		}
 	});

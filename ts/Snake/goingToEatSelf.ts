@@ -10,12 +10,14 @@ export default function goingToEatSelf(snakeSummary: SnakeSummary): boolean {
 
 	while (true) {
 		
+		if (isSnakeEnd(currentSegment.tailBoundNode))
+			break;
+		
 		let b = currentSegment.boardSpaceNode;
+		
 		if (b.board_x == headSpace.board_x && b.board_y == headSpace.board_y)
 			return true;
 		
-		if (isSnakeEnd(currentSegment.tailBoundNode))
-			break;
 
 		currentSegment = currentSegment.tailBoundNode;
 	}

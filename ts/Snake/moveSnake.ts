@@ -14,21 +14,21 @@ export default function moveSnake(snakeSummary: SnakeSummary): SnakeSummary {
 	
 	const oldSnakeFront = snakeSummary.snakeFront;
 	const newSnakeFront = snakeSummary.snakeBack;
-	const newSnakeBack = newSnakeFront.headBoundNode as SnakeNode;
+	const newSnakeBack = snakeSummary.snakeBack.headBoundNode as SnakeNode;
 	
+	const headMovesInDirection = findBoardRelation(
+		snakeSummary.snakeFront.boardSpaceNode,
+		snakeSummary.snakeHead.boardSpaceNode
+	);
+
 	// Move snake tail to where back node is
-	snakeSummary.snakeTail.boardSpaceNode = newSnakeFront.boardSpaceNode;
+	snakeSummary.snakeTail.boardSpaceNode = snakeSummary.snakeBack.boardSpaceNode;
 	
 	// Move the new snake front to where the head currently is
 	newSnakeFront.boardSpaceNode = snakeSummary.snakeHead.boardSpaceNode;
 
 	// Move the head node one space further in the direction it is going
-	const relation = findBoardRelation(
-		oldSnakeFront.boardSpaceNode,
-		snakeSummary.snakeHead.boardSpaceNode
-	);
-	snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeHead.boardSpaceNode, relation);
-
+	snakeSummary.snakeHead.boardSpaceNode = accessNodeRelation(snakeSummary.snakeHead.boardSpaceNode, headMovesInDirection);
 
 	// Connect new snakeBack to tail
 	newSnakeBack.tailBoundNode = newSnakeFront.tailBoundNode;

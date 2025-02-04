@@ -26,12 +26,15 @@ var appleSoon: Apple = {
 	board_y: 0
 };
 
+export var gameActive = true;
 const gameRunning: HTMLSpanElement = document.getElementById('gameRunning');
 export var spriteSheetImage: HTMLImageElement;
+export var spriteSheetExploringImage: HTMLImageElement;
 
 export function init() {
 
 	spriteSheetImage = document.getElementById("spriteSheet") as HTMLImageElement;
+	spriteSheetExploringImage = document.getElementById("spriteSheetExploring") as HTMLImageElement;
 	
 	// Populate a board and return a list of nodes
 	const boardNodes: BoardNode[] = createBoard(BOARD_WIDTH, BOARD_HEIGHT);
@@ -57,7 +60,7 @@ export function init() {
 	// spawnApple()
 
 	// Determine path
-	const e = exploreSnake(snakeSummary, appleNow);
+	const e = exploreSnake(createSnakeCopy(snakeSummary), appleNow);
 	getPathFromExpedition(e, keysBuffer);
 
 	// GAME_LOOP = setInterval(tick, 125);
@@ -71,6 +74,7 @@ export async function snakeTickFunction() {
 	if (keysBuffer.length == 0) {
 		console.log('Key buffer empty, Game Over');
 		gameRunning.innerText = 'false';
+		gameActive = false;
 		// clearInterval(GAME_LOOP);
 		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
 		return;
@@ -85,6 +89,7 @@ export async function snakeTickFunction() {
 		// clearInterval(GAME_LOOP);
 		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
 		gameRunning.innerText = 'false';
+		gameActive = false;
 		return;
 	}
 	
@@ -93,6 +98,7 @@ export async function snakeTickFunction() {
 		// clearInterval(GAME_LOOP);
 		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
 		gameRunning.innerText = 'false';
+		gameActive = false;
 		return;
 	}
 	
@@ -106,6 +112,7 @@ export async function snakeTickFunction() {
 			console.log('More than one key left, Game Over');
 			gameRunning.innerText = 'false';
 			// clearInterval(GAME_LOOP);
+			gameActive = false;
 			return;
 		}
 		

@@ -15,7 +15,8 @@ export default function createSnakeCopy(snakeSummary: SnakeSummary): SnakeSummar
 		boardSpaceNode: snakeSummary.snakeFront.boardSpaceNode,
 		headBoundNode: snakeHead,
 		tailBoundNode: snakeTail,
-		isEnd: false
+		isEnd: false,
+		dirToTail: snakeSummary.snakeFront.dirToTail,
 	}
 	let snakeBack = snakeFront;
 
@@ -28,7 +29,8 @@ export default function createSnakeCopy(snakeSummary: SnakeSummary): SnakeSummar
 			boardSpaceNode: currentSegment.boardSpaceNode,
 			headBoundNode: snakeHead,
 			tailBoundNode: snakeTail,
-			isEnd: false
+			isEnd: false,
+			dirToTail: currentSegment.dirToTail,
 		}
 		
 		// Link it into the current snake

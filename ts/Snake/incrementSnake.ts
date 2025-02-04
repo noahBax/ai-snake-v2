@@ -13,7 +13,8 @@ export default function incrementSnake(snakeSummary: SnakeSummary): SnakeSummary
 		boardSpaceNode: snakeSummary.snakeHead.boardSpaceNode,
 		headBoundNode: snakeSummary.snakeHead,
 		tailBoundNode: snakeSummary.snakeFront,
-		isEnd: false
+		isEnd: false,
+		dirToTail: findBoardRelation(snakeSummary.snakeHead.boardSpaceNode, snakeSummary.snakeFront.boardSpaceNode),
 	}
 	snakeSummary.snakeFront.headBoundNode = newSegment;
 	snakeSummary.snakeFront = newSegment;

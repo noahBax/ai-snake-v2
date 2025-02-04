@@ -11,6 +11,7 @@ import frontCanSeeSnakeTail from "./Rules/frontCanSeeSnakeTail.js";
 import tailNotSnakeFrontNeighbor from "./Rules/tailNotSnakeFrontNeighbor.js";
 import { snakeDrawBuffer } from "../DrawingTools/snakeDrawBuffer.js";
 import { isDuplicate, CompassNode } from "./duplicateFinder.js";
+import { upperIndex } from "../DrawingTools/frameManager.js";
 
 export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): Expedition {
 	
@@ -27,9 +28,10 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		atApple: false,
 	}
 	expeditions.push(empty);
-	const duplicateBoard: CompassNode[] = [];
+
+	const duplicateBoard = [];
 	
-	let limit = 20000;
+	let limit = 50000;
 	while (!goalMet && limit > 0) {
 		limit--;
 		
@@ -41,21 +43,35 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		const bestPath = expeditions.reduce((a,b) => {if (a.utility < b.utility) {return a} else {return b}});
 		expeditions.splice(expeditions.indexOf(bestPath), 1);
 
+		findBoardRelation(bestPath.snake.snakeFront.boardSpaceNode, bestPath.snake.snakeFront.tailBoundNode.boardSpaceNode);
+
 		// Check to see if it is a duplicate
 		if (isDuplicate(duplicateBoard, bestPath)) {
 			console.log('duped');
 			continue;
 		}
 
+		// if (!isDuplicate(duplicateBoard, bestPath)) {
+		// 	console.error('BEEP');
+		// 	return;
+		// }
+
+		upperIndex();
+		snakeDrawBuffer.push([bestPath.snake, {...apple}, -1]);
+		
 		// Check to see if the path with the best utility has reached the apple
 		if (bestPath.atApple) {
 
 
 			// Check to see that it passes all of the rules
-			if (!checkMeetsRules(bestPath)) {
-				// snakeDrawBuffer.push([bestPath.snake, {...apple}]);
+			const ruleBroken = checkMeetsRules(bestPath);
+			if (ruleBroken > 0) {
+				// snakeDrawBuffer.push([bestPath.snake, {...apple}, ruleBroken]);
+				console.log('Fail');
 				continue;
 			}
+
+			console.log(bestPath.path);
 			
 			winner = bestPath;
 			goalMet = true;
@@ -63,9 +79,7 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		}
 
 		const pioneers = expandAtNode(bestPath, apple);
-		for (const p in pioneers) {
-			expeditions.push(pioneers[p]);
-		}
+		expeditions.push(...pioneers);
 		
 	}
 
@@ -76,57 +90,53 @@ function expandAtNode(expedition: Expedition, apple: Apple): Expedition[] {
 
 	const front = expedition.snake.snakeFront.boardSpaceNode;
 	
-	const possibleDirections: BoardNode[] = [
+	const possibleSpots: BoardNode[] = [
 		accessNodeRelation(front, DIRECTION.north),
 		accessNodeRelation(front, DIRECTION.east),
 		accessNodeRelation(front, DIRECTION.south),
 		accessNodeRelation(front, DIRECTION.west),
 	];
 
-	// Eliminate empty nodes
-	for (let n = 0; n < possibleDirections.length; n++) {
-		if (possibleDirections[n] == EMPTY_NODE)
-			possibleDirections.splice(n, 1);
-	}
+	const validDirections = possibleSpots.filter(d => d != EMPTY_NODE);
 
-	// Loop through every node in the body and eliminate a direction if it
-	// overlaps
 	let currentSegment = expedition.snake.snakeFront.tailBoundNode as SnakeNode;
-	while (possibleDirections.length > 0) {
+	while (validDirections.length > 0) {
 
+		
 		const bodySegmentSpot = currentSegment.boardSpaceNode;
+
+		// If this is the end of the snake, break out
+		if (isSnakeEnd(currentSegment.tailBoundNode)) {
+			break;
+		}
 		
 		// Check each direction for overlap
-		for (let n = 0; n < possibleDirections.length; n++) {
-
-			const overlapX = possibleDirections[n].board_x == bodySegmentSpot.board_x;
-			const overlapY = possibleDirections[n].board_y == bodySegmentSpot.board_y;
-
+		for (let n = 0; n < validDirections.length; n++) {
+			
+			const overlapX = validDirections[n].board_x == bodySegmentSpot.board_x;
+			const overlapY = validDirections[n].board_y == bodySegmentSpot.board_y;
+			
 			if (overlapX && overlapY) {
-				possibleDirections.splice(n, 1);
+				validDirections.splice(n, 1);
 				break;
 			}
 		}
-
-		// If this is the end of the snake, break out
-		if (isSnakeEnd(currentSegment.tailBoundNode))
-			break;
-
-		// Otherwise, advance to next node
-		else
-			currentSegment = currentSegment.tailBoundNode;
+		
+		currentSegment = currentSegment.tailBoundNode;
 	}
 
 	// The remaining directions are where we should explore
 	const ret: Expedition[] = [];
-	for (const n in possibleDirections) {
-		ret.push(stepTowards(expedition, possibleDirections[n], apple));
+	for (const n in validDirections) {
+		ret.push(stepTowards(expedition, validDirections[n], apple));
 	}
 
 	return ret;
 }
 
 function stepTowards(expedition: Expedition, node: BoardNode, apple: Apple): Expedition {
+
+	// console.log('Stepping towards');
 
 	let snake = createSnakeCopy(expedition.snake);
 	const snakeFront = snake.snakeFront.boardSpaceNode;
@@ -136,12 +146,16 @@ function stepTowards(expedition: Expedition, node: BoardNode, apple: Apple): Exp
 	const path = [...expedition.path];
 	path.push(relation);
 
+	// console.log(`Stepping from ${snakeFront.board_x}, ${snakeFront.board_y} to ${node.board_x}, ${node.board_y}`);
+
 	
 	// Amend snake
 	snake.snakeHead.boardSpaceNode = node;
 	snake = moveSnake(snake);
 
-	const u = utility.taxi(apple, node);
+	// const u = utility.taxi(apple, node);
+	const u = utility.stable(apple, node, expedition);
+	// const u = utility.direct(apple, node);
 
 	const atApple = node.board_x == apple.board_x && node.board_y == apple.board_y;
 
@@ -153,11 +167,18 @@ function stepTowards(expedition: Expedition, node: BoardNode, apple: Apple): Exp
 	};
 }
 
-function checkMeetsRules(e: Expedition) {
+function checkMeetsRules(e: Expedition): number {
 	const rules: ((e: Expedition) => boolean)[] = [
 		frontCanSeeSnakeTail,
-		tailNotSnakeFrontNeighbor,
+		// tailNotSnakeFrontNeighbor,
 	];
 
-	return rules.every( r => r(e));
+	for (let r = 0; r < rules.length; r++) {
+		if (!rules[r](e)) {
+			return r+1;
+		}
+	}
+
+	return 0;
+	// return rules.every( r => r(e));
 }

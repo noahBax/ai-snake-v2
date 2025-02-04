@@ -9,6 +9,7 @@ export default function createSnake(boardNodes: BoardNode[]): SnakeSummary {
 	const seg1: BoardNode = accessNodeRelation(seg0, DIRECTION.west);
 	const seg2: BoardNode = accessNodeRelation(seg1, DIRECTION.west);
 	const seg3: BoardNode = accessNodeRelation(seg2, DIRECTION.west);
+	const seg4: BoardNode = accessNodeRelation(seg3, DIRECTION.west);
 	
 	const snakeHead: SnakeEnd = {
 		boardSpaceNode: seg0,
@@ -24,18 +25,28 @@ export default function createSnake(boardNodes: BoardNode[]): SnakeSummary {
 		headBoundNode: snakeHead,
 		tailBoundNode: snakeHead,  // Temporary
 		boardSpaceNode: seg1,
-		isEnd: false
+		isEnd: false,
+		dirToTail: DIRECTION.west,
+	}
+	const snakeMid: SnakeNode = {
+		headBoundNode: snakeFront,
+		tailBoundNode: snakeFront, // Temporary
+		boardSpaceNode: seg2,
+		isEnd: false,
+		dirToTail: DIRECTION.west,
 	}
 	const snakeBack: SnakeNode = {
-		headBoundNode: snakeFront,
+		headBoundNode: snakeMid,
 		tailBoundNode: snakeTail,
-		boardSpaceNode: seg2,
-		isEnd: false
+		boardSpaceNode: seg3,
+		isEnd: false,
+		dirToTail: DIRECTION.west,
 	}
-	snakeFront.tailBoundNode = snakeBack;
+	snakeFront.tailBoundNode = snakeMid;
+	snakeMid.tailBoundNode = snakeBack
 
 	return {
-		length: 2,
+		length: 3,
 		snakeFront: snakeFront,
 		snakeBack: snakeBack,
 		snakeHead: snakeHead,

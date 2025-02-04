@@ -16,7 +16,7 @@
 		.metric {
 			color: white;
 		}
-		#spriteSheet {
+		#spriteSheet, #spriteSheetExploring {
             display: none;
         }
 	</style>
@@ -28,8 +28,17 @@
 			<span>Snake nodes: </span>
 			<span id="numSnakeNodes">2</span>
 		</div>
+		<div class="metric">
+			<span>Frame Comment: </span>
+			<span id="frameComment"></span>
+		</div>
+		<div class="metric">
+			<span>Game running: </span>
+			<span id="gameRunning">true</span>
+		</div>
 	</div>
 	<img src="spritesheet.png" id="spriteSheet">
+	<img src="spritesheetexploring.png" id="spriteSheetExploring">
 	<script src="js/index.js" type="module"></script>
 </body>
 </html>

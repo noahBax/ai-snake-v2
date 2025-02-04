@@ -1,4 +1,4 @@
-import { BOARD_WIDTH } from "../preferences.js";
+import { BOARD_HEIGHT, BOARD_WIDTH } from "../preferences.js";
 import getSnakeInstructions from "../Snake/getSnakeInstructions.js";
 import { DIRECTION } from "../snakeNodes.js";
 import Expedition from "./expedition.js";

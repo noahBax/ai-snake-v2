@@ -21,6 +21,8 @@ export interface SnakeNode {
 	tailBoundNode: SnakeNode | SnakeEnd;
 
 	boardSpaceNode: BoardNode;
+
+	dirToTail: DIRECTION;
 }
 
 /**

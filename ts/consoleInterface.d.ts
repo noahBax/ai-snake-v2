@@ -9,6 +9,6 @@ declare global {
 		snakeSummary: SnakeSummary;
 		emptyNode: BoardNode;
 		keysBuffer: DIRECTION[];
-		snakeDrawBuffer: [SnakeSummary, Apple][]; 
+		snakeDrawBuffer: [SnakeSummary, Apple, number][]; 
 	}
 }
