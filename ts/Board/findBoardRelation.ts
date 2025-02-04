@@ -1,18 +1,18 @@
 import { BoardNode, DIRECTION } from "../snakeNodes.js";
 
 // Determine the orientation that a node2 is to node1
-export default function findBoardRelation(node1: BoardNode, node2: BoardNode): DIRECTION {
+export default function findBoardRelation(travelFrom: BoardNode, toNode: BoardNode): DIRECTION {
 
-	if (node2 == node1.north)
+	if (toNode == travelFrom.north)
 		return DIRECTION.north;
 
-	if (node2 == node1.east)
+	if (toNode == travelFrom.east)
 		return DIRECTION.east;
 
-	if (node2 == node1.south)
+	if (toNode == travelFrom.south)
 		return DIRECTION.south;
 
-	if (node2 == node1.west)
+	if (toNode == travelFrom.west)
 		return DIRECTION.west;
 
 	console.error("Called findBoardRelation with two non-adjacent nodes");
