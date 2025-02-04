@@ -1,7 +1,7 @@
 import { BOARD_WIDTH } from "../preferences.js";
+import getSnakeInstructions from "../Snake/getSnakeInstructions.js";
 import { DIRECTION } from "../snakeNodes.js";
 import Expedition from "./expedition.js";
-import getPathFromExpedition from "./getPathFromExpedition.js";
 
 export class CompassNode {
 
@@ -28,23 +28,21 @@ export function isDuplicate(duplicateBoard: CompassNode[], expedition: Expeditio
 	const boardIndex = boardLoc.board_y * BOARD_WIDTH + boardLoc.board_x;
 
 	let currentNode = duplicateBoard[boardIndex];
-	let remainingMoves: DIRECTION[] = [];
-	getPathFromExpedition(expedition, remainingMoves);
-	remainingMoves = remainingMoves.slice(-expedition.snake.length);
+	let snakeInstructions = getSnakeInstructions(expedition.snake);
 
 	if (!duplicateBoard[boardIndex]) {
-		duplicateBoard[boardIndex] = fillOutRemainingTree(remainingMoves);
+		duplicateBoard[boardIndex] = fillOutRemainingTree(snakeInstructions);
 		return false;
-	}
-	
+	}	
 
-	while (remainingMoves.length > 0) {
-		const dir = remainingMoves.pop();
-		if (!currentNode[dir]) {
+	while (snakeInstructions.length > 0) {
+		const dir = snakeInstructions.pop();
+		if (!currentNode.dirs[dir]) {
 			// Not a duplicate
-			currentNode[dir] = fillOutRemainingTree(remainingMoves);
+			currentNode.dirs[dir] = fillOutRemainingTree(snakeInstructions);
 			return false;
 		}
+		currentNode = currentNode.dirs[dir];
 	}
 
 	return true
@@ -58,14 +56,8 @@ function fillOutRemainingTree(steps: DIRECTION[]): CompassNode {
 		return newNode;
 
 	const dir = steps.pop();
-	newNode[dir] = fillOutRemainingTree(steps);
+	newNode.dirs[dir] = fillOutRemainingTree(steps);
 
 	return newNode;
 	
 }
-
-// export function maxPossibleApproaches
-
-// export function allApproachesCovered(node: CompassNode, snakeLength: number): boolean {
-	
-// }
