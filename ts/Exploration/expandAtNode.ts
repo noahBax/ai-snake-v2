@@ -1,0 +1,102 @@
+import accessNodeRelation from "../Board/accessNodeRelation.js";
+import Apple from "../Board/apple.js";
+import { EMPTY_NODE } from "../Board/createBoard.js";
+import findBoardRelation from "../Board/findBoardRelation.js";
+import createSnakeCopy from "../Snake/createSnakeCopy.js";
+import moveSnake from "../Snake/moveSnake.js";
+import { BoardNode, DIRECTION, SnakeNode, isSnakeEnd } from "../snakeNodes.js";
+import Expedition from "./expedition.js";
+import * as utility from "../utilityFunctions/utilityFunctions.js";
+import { CompassNode, isDuplicate } from "./duplicateFinder.js";
+
+
+export default function expandAtNode(expedition: Expedition, apple: Apple, duplicateBoard?: CompassNode[]): Expedition[] {
+	console.log('Called with path:', JSON.stringify(expedition.path).replace(/,/g, ''));
+	window.expandAtNode = expandAtNode;
+
+	const front = expedition.snake.snakeFront.boardSpaceNode;
+	
+	const possibleSpots: BoardNode[] = [
+		accessNodeRelation(front, DIRECTION.north),
+		accessNodeRelation(front, DIRECTION.east),
+		accessNodeRelation(front, DIRECTION.south),
+		accessNodeRelation(front, DIRECTION.west),
+	];
+
+	const validDirections = possibleSpots.filter(d => d != EMPTY_NODE);
+
+	let currentSegment = expedition.snake.snakeFront.tailBoundNode as SnakeNode;
+	while (validDirections.length > 0) {
+
+		
+		const bodySegmentSpot = currentSegment.boardSpaceNode;
+
+		// If this is the end of the snake, break out
+		if (isSnakeEnd(currentSegment.tailBoundNode)) {
+			break;
+		}
+		
+		// Check each direction for overlap
+		for (let n = 0; n < validDirections.length; n++) {
+			
+			const overlapX = validDirections[n].board_x == bodySegmentSpot.board_x;
+			const overlapY = validDirections[n].board_y == bodySegmentSpot.board_y;
+			
+			if (overlapX && overlapY) {
+				validDirections.splice(n, 1);
+				break;
+			}
+		}
+		
+		currentSegment = currentSegment.tailBoundNode;
+	}
+
+	// The remaining directions are where we should explore
+	const validExpeditions: Expedition[] = [];
+	for (const v of validDirections) {
+		validExpeditions.push(stepTowards(expedition, v, apple));
+	}
+
+	// Check for duplicates
+	const ret: Expedition[] = [];
+	for (const e of validExpeditions) {
+		if (!duplicateBoard || !isDuplicate(duplicateBoard, e))
+			ret.push(e);
+
+	}
+
+	return ret;
+}
+
+function stepTowards(expedition: Expedition, node: BoardNode, apple: Apple): Expedition {
+
+	// console.log('Stepping towards');
+
+	let snake = createSnakeCopy(expedition.snake);
+	const snakeFront = snake.snakeFront.boardSpaceNode;
+	
+	// Amend path
+	const relation = findBoardRelation(snakeFront, node);
+	const path = [...expedition.path];
+	path.push(relation);
+
+	// console.log(`Stepping from ${snakeFront.board_x}, ${snakeFront.board_y} to ${node.board_x}, ${node.board_y}`);
+
+	
+	// Amend snake
+	snake.snakeHead.boardSpaceNode = node;
+	snake = moveSnake(snake);
+
+	// const u = utility.taxi(apple, node);
+	const u = utility.stable(apple, node, expedition);
+	// const u = utility.direct(apple, node);
+
+	const atApple = node.board_x == apple.board_x && node.board_y == apple.board_y;
+
+	return {
+		path: path,
+		snake: snake,
+		utility: u,
+		atApple: atApple
+	};
+}
