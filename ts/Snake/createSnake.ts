@@ -13,12 +13,14 @@ export default function createSnake(boardNodes: BoardNode[]): SnakeSummary {
 	
 	const snakeHead: SnakeEnd = {
 		boardSpaceNode: seg0,
-		isEnd: true
+		isEnd: true,
+		dirToTail: DIRECTION.west,
 	}
 	
 	const snakeTail: SnakeEnd = {
 		boardSpaceNode: seg3,
-		isEnd: true
+		isEnd: true,
+		dirToTail: DIRECTION.west,
 	}
 
 	const snakeFront: SnakeNode = {

@@ -4,11 +4,13 @@ export default function createSnakeCopy(snakeSummary: SnakeSummary): SnakeSummar
 
 	const snakeHead: SnakeEnd = {
 		boardSpaceNode: snakeSummary.snakeHead.boardSpaceNode,
-		isEnd: true
+		isEnd: true,
+		dirToTail: snakeSummary.snakeHead.dirToTail,
 	}
 	const snakeTail: SnakeEnd = {
 		boardSpaceNode: snakeSummary.snakeTail.boardSpaceNode,
-		isEnd: true
+		isEnd: true,
+		dirToTail: snakeSummary.snakeTail.dirToTail,
 	}
 
 	const snakeFront: SnakeNode = {
