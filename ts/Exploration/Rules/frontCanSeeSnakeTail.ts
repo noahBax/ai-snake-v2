@@ -25,15 +25,9 @@ export default function frontCanSeeSnakeTail(e: Expedition): boolean {
 
 	let foundEndNode = false;
 
-	while (toExplore.length > 0) {
+	while (toExplore.length > 0 && !foundEndNode) {
 
 		const n = toExplore.pop();
-
-		// If we can see the endNode, exit
-		if (n == endNode) {
-			foundEndNode = true;
-			break;
-		}
 
 		const expansions: BoardNode[] = [
 			accessNodeRelation(n, DIRECTION.north),
@@ -43,6 +37,12 @@ export default function frontCanSeeSnakeTail(e: Expedition): boolean {
 		];
 
 		for (const p of expansions) {
+
+			// If we can see the endNode, exit
+			if (n == endNode) {
+				foundEndNode = true;
+				break;
+			}
 
 			if (explored.includes(p))
 				continue;
