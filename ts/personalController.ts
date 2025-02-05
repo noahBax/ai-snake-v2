@@ -1,7 +1,7 @@
 import accessNodeRelation from "./Board/accessNodeRelation.js";
 import findBoardRelation from "./Board/findBoardRelation.js";
 import { unlock_tick } from "./DrawingTools/frameLocks.js";
-import { lowerIndex } from "./DrawingTools/frameManager.js";
+import { lowerIndex, upperIndex } from "./DrawingTools/frameManager.js";
 import { DIRECTION, SnakeSummary } from "./snakeNodes.js";
 
 export const keysBuffer: DIRECTION[] = [];
@@ -65,6 +65,12 @@ export function initController() {
 	document.addEventListener('keydown', (event) => {
 
 		// Don't process if the key is already down
+
+		if (event.key == "a")
+			lowerIndex();
+		else if (event.key == "d")
+			upperIndex();
+		
 		if (event.repeat)
 			return;
 		switch (event.key) {
@@ -89,9 +95,6 @@ export function initController() {
 				console.log('unlocksing');
 				break;
 			
-			case "a":
-				lowerIndex();
-				break;
 		}
 	});
 	window.keysBuffer = keysBuffer;
