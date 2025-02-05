@@ -15,7 +15,7 @@ export function taxi(p1: Apple, p2: Apple): number {
 // const turnPenaltyTable = 
 
 export function stable(apple: Apple, frontSpace: BoardNode, backSpace: BoardNode, expedition: Expedition): number {
-	const zigzag = taxi(apple, frontSpace) / 2;
+	const zigzag = taxi(apple, frontSpace);
 	let turn_penalty = 0;
 
 	const buffer: DIRECTION[] = [];
@@ -36,60 +36,71 @@ export function stable(apple: Apple, frontSpace: BoardNode, backSpace: BoardNode
 	let straightCount = 0;
 	let turnCounts = 0;
 
-	let currentSegment = expedition.snake.snakeFront.tailBoundNode as SnakeNode;
-	let last_dir = expedition.snake.snakeFront.dirToTail;
-	let i = 0;
-	while (true) {
-		const d = currentSegment.dirToTail;
-		i++;
-
-		if (isSnakeEnd(currentSegment.tailBoundNode))
-			break;
-
-		currentSegment = currentSegment.tailBoundNode;
-
-		// const d = directions[i];
-		if (d == last_dir)
+	// let currentSegment = expedition.snake.snakeFront.tailBoundNode as SnakeNode;
+	// let last_dir = expedition.snake.snakeFront.dirToTail;
+	// let i = 0;
+	let lastDir = directions[0];
+	for (const d of directions.slice(1)) {
+		if (d == lastDir)
 			straightCount++;
 		else {
-	
-			// Update last_dir
-			last_dir = d;
-	
-			// Up turn counts
-			if (straightCount < 4)
-				turnCounts++;
-			
-			const segmentPenalty = segmentLengthPenalty(straightCount);
-			const distanceFromStartMultiplier = distanceFromStartPenalty(i - straightCount);
-			const distanceFromAppleMultiplier = distanceToApplePenalty(direct(apple, currentSegment.boardSpaceNode));
-	
-			turn_penalty += segmentPenalty * distanceFromStartMultiplier// * distanceFromAppleMultiplier;
-			// turn_penalty += segmentPenalty * distanceFromAppleMultiplier;
-	
-			// Reset straight count
+			if (straightCount < 3)
+				turnCounts++
+			lastDir = d;
 			straightCount = 0;
-			
-			// // if (straightCount == 0 && base == 0)
-			// // 	turn_penalty += 5000;
-			// // else {
-			// 	last_dir = d;
-			// 	turnCounts++;
-			// 	// turn_penalty += (expedition.snake.length - straightCount) * 2;
-			// 	// turn_penalty += Math.sqrt((directions.length - straightCount) ** 2 / zigzag);
-			// 	// break;
-			// 	turn_penalty +=( (expedition.snake.length / straightCount) - 1) ** 2;
-			// 	straightCount = 0;
-			// // }
 		}
 	}
+	// while (true) {
+	// 	const d = currentSegment.dirToTail;
+	// 	i++;
+
+	// 	if (isSnakeEnd(currentSegment.tailBoundNode))
+	// 		break;
+
+	// 	currentSegment = currentSegment.tailBoundNode;
+
+	// 	// const d = directions[i];
+	// 	if (d == lastDir)
+	// 		straightCount++;
+	// 	else {
+	
+	// 		// Update last_dir
+	// 		lastDir = d;
+	
+	// 		// Up turn counts
+	// 		if (straightCount < 4)
+	// 			turnCounts++;
+			
+	// 		const segmentPenalty = segmentLengthPenalty(straightCount);
+	// 		const distanceFromStartMultiplier = distanceFromStartPenalty(i - straightCount);
+	// 		const distanceFromAppleMultiplier = distanceToApplePenalty(direct(apple, currentSegment.boardSpaceNode));
+	
+	// 		turn_penalty += segmentPenalty * distanceFromStartMultiplier// * distanceFromAppleMultiplier;
+	// 		// turn_penalty += segmentPenalty * distanceFromAppleMultiplier;
+	
+	// 		// Reset straight count
+	// 		straightCount = 0;
+			
+	// 		// // if (straightCount == 0 && base == 0)
+	// 		// // 	turn_penalty += 5000;
+	// 		// // else {
+	// 		// 	last_dir = d;
+	// 		// 	turnCounts++;
+	// 		// 	// turn_penalty += (expedition.snake.length - straightCount) * 2;
+	// 		// 	// turn_penalty += Math.sqrt((directions.length - straightCount) ** 2 / zigzag);
+	// 		// 	// break;
+	// 		// 	turn_penalty +=( (expedition.snake.length / straightCount) - 1) ** 2;
+	// 		// 	straightCount = 0;
+	// 		// // }
+	// 	}
+	// }
 
 	// for (let i = 0; i < directions.length; i++) {
 	// }
 	// turn_penalty +=( (expedition.snake.length / straightCount) - 1) ** 2;
 	// turn_penalty = turn_penalty;
 	
-	return turnCounts**1.3 + zigzag// - (1 - distanceToBack / expedition.snake.length);
+	return turnCounts + zigzag + distanceToBack/4// - (1 - distanceToBack / expedition.snake.length);
 }
 
 function segmentLengthPenalty(x: number): number {
