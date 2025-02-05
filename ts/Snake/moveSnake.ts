@@ -40,5 +40,9 @@ export default function moveSnake(snakeSummary: SnakeSummary): SnakeSummary {
 	oldSnakeFront.headBoundNode = newSnakeFront;
 	snakeSummary.snakeFront = newSnakeFront;
 
+	// Adjust the dirToTail of the new snakeFront
+	let tailFacing = findBoardRelation(snakeSummary.snakeFront.boardSpaceNode, snakeSummary.snakeFront.tailBoundNode.boardSpaceNode);
+	snakeSummary.snakeFront.dirToTail = tailFacing
+
 	return snakeSummary;
 }
