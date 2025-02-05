@@ -35,6 +35,7 @@ export interface SnakeNode {
 export interface SnakeEnd {
 	isEnd: true;
 	boardSpaceNode: BoardNode;
+	dirToTail: DIRECTION;
 }
 
 export interface BoardNode {
