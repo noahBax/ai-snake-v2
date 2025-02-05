@@ -1,6 +1,7 @@
 import Apple, { goingToEatApple, spawnApple } from "./Board/apple.js";
 import createBoard, { EMPTY_NODE } from "./Board/createBoard.js";
 import { unlock_tick } from "./DrawingTools/frameLocks.js";
+import { initFrameManager } from "./DrawingTools/frameManager.js";
 import initDrawingTools from "./DrawingTools/initDrawingTools.js";
 import { snakeDrawBuffer } from "./DrawingTools/snakeDrawBuffer.js";
 import Expedition from "./Exploration/expedition.js";
@@ -30,11 +31,13 @@ export var gameActive = true;
 const gameRunning: HTMLSpanElement = document.getElementById('gameRunning');
 export var spriteSheetImage: HTMLImageElement;
 export var spriteSheetExploringImage: HTMLImageElement;
+export var spriteSheetBadImage: HTMLImageElement;
 
 export function init() {
 
 	spriteSheetImage = document.getElementById("spriteSheet") as HTMLImageElement;
 	spriteSheetExploringImage = document.getElementById("spriteSheetExploring") as HTMLImageElement;
+	spriteSheetBadImage = document.getElementById("spriteSheetBad") as HTMLImageElement;
 	
 	// Populate a board and return a list of nodes
 	const boardNodes: BoardNode[] = createBoard(BOARD_WIDTH, BOARD_HEIGHT);
@@ -52,6 +55,7 @@ export function init() {
 
 	initDrawingTools(BOARD_WIDTH, BOARD_HEIGHT, DRAW_NODE_SIZE);
 	initController();
+	initFrameManager();
 
 	// Spawn the apple
 	spawnApple(snakeSummary, appleNow);
@@ -106,11 +110,11 @@ export async function snakeTickFunction() {
 	if (goingToEatApple(snakeSummary, appleNow)) {
 		snakeSummary = incrementSnake(snakeSummary);
 		spawnApple(snakeSummary, appleNow);
-		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
 		
 		if (keysBuffer.length != 0) {
 			console.log('More than one key left, Game Over');
 			gameRunning.innerText = 'false';
+			snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
 			// clearInterval(GAME_LOOP);
 			gameActive = false;
 			return;
