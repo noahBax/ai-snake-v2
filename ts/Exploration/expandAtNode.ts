@@ -6,15 +6,15 @@ import createSnakeCopy from "../Snake/createSnakeCopy.js";
 import moveSnake from "../Snake/moveSnake.js";
 import { BoardNode, DIRECTION, SnakeNode, isSnakeEnd } from "../snakeNodes.js";
 import Expedition from "./expedition.js";
-import * as utility from "../utilityFunctions/utilityFunctions.js";
 import { CompassNode, isDuplicate } from "./duplicateFinder.js";
+import { FamilyNode } from "./LineageManager/lineage.js";
 
 
 export default function expandAtNode(expedition: Expedition, apple: Apple, duplicateBoard?: CompassNode[]): Expedition[] {
-	console.log('Called with path:', JSON.stringify(expedition.path).replace(/,/g, ''));
 	window.expandAtNode = expandAtNode;
 
 	const front = expedition.snake.snakeFront.boardSpaceNode;
+	const back = expedition.snake.snakeBack.boardSpaceNode;
 	
 	const possibleSpots: BoardNode[] = [
 		accessNodeRelation(front, DIRECTION.north),
@@ -54,7 +54,7 @@ export default function expandAtNode(expedition: Expedition, apple: Apple, dupli
 	// The remaining directions are where we should explore
 	const validExpeditions: Expedition[] = [];
 	for (const v of validDirections) {
-		validExpeditions.push(stepTowards(expedition, v, apple));
+		validExpeditions.push(stepTowards(expedition, v, back, apple));
 	}
 
 	// Check for duplicates
@@ -68,35 +68,32 @@ export default function expandAtNode(expedition: Expedition, apple: Apple, dupli
 	return ret;
 }
 
-function stepTowards(expedition: Expedition, node: BoardNode, apple: Apple): Expedition {
-
-	// console.log('Stepping towards');
+function stepTowards(expedition: Expedition, frontNode: BoardNode, backNode: BoardNode, apple: Apple): Expedition {
 
 	let snake = createSnakeCopy(expedition.snake);
 	const snakeFront = snake.snakeFront.boardSpaceNode;
 	
 	// Amend path
-	const relation = findBoardRelation(snakeFront, node);
+	const relation = findBoardRelation(snakeFront, frontNode);
 	const path = [...expedition.path];
 	path.push(relation);
-
-	// console.log(`Stepping from ${snakeFront.board_x}, ${snakeFront.board_y} to ${node.board_x}, ${node.board_y}`);
-
 	
 	// Amend snake
-	snake.snakeHead.boardSpaceNode = node;
+	snake.snakeHead.boardSpaceNode = frontNode;
 	snake = moveSnake(snake);
 
-	// const u = utility.taxi(apple, node);
-	const u = utility.stable(apple, node, expedition);
-	// const u = utility.direct(apple, node);
 
-	const atApple = node.board_x == apple.board_x && node.board_y == apple.board_y;
+	const atApple = frontNode.board_x == apple.board_x && frontNode.board_y == apple.board_y;
+	const daughterNode = new FamilyNode(expedition.lineageNode);
+
+	expedition.lineageNode.children.push(daughterNode);
 
 	return {
 		path: path,
 		snake: snake,
-		utility: u,
-		atApple: atApple
+		utility: 0,
+		atApple: atApple,
+		lineageNode: daughterNode,
+		age: expedition.age+1
 	};
 }
