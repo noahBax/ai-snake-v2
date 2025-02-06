@@ -38,7 +38,12 @@ export interface SnakeEnd {
 	dirToTail: DIRECTION;
 }
 
-export interface BoardNode {
+export interface GridSpot {
+	board_x: number;
+	board_y: number;
+}
+
+export interface BoardNode extends GridSpot {
 
 	// How do we get to other nodes
 	readonly north: BoardNode;

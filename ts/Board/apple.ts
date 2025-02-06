@@ -1,13 +1,11 @@
-import { GAME_BOARD_CTX, NODE_SIZE } from "../DrawingTools/initDrawingTools.js";
-import { SHEET } from "../sheet.js";
-import { BoardNode, isSnakeEnd, SnakeSummary } from "../snakeNodes.js";
+import { BoardNode, GridSpot, isSnakeEnd, SnakeSummary } from "../snakeNodes.js";
 
 // export var APPLE: Apple = {
 // 	board_x: 0,
 // 	board_y: 0
 // };
 
-export default interface Apple {
+export default interface Apple extends GridSpot {
 	board_x: number;
 	board_y: number;
 }
