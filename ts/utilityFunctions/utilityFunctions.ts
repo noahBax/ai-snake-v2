@@ -1,44 +1,25 @@
 import Apple from "../Board/apple.js";
 import Expedition from "../Exploration/expedition.js";
-import getPathFromExpedition from "../Exploration/getPathFromExpedition.js";
 import getSnakeInstructions from "../Snake/getSnakeInstructions.js";
-import { BoardNode, DIRECTION, isSnakeEnd, SnakeNode } from "../snakeNodes.js";
 
-export function direct(apple: Apple, frontSpace: BoardNode): number {
-	return (apple.board_x - frontSpace.board_x) ** 2 + (apple.board_y - frontSpace.board_y) ** 2;
+export function direct(expedition: Expedition, apple: Apple): number {
+	const p1 = expedition.snake.snakeFront.boardSpaceNode;
+	const p2 = apple;
+	return (p1.board_x - p2.board_x) ** 2 + (p1.board_y - p2.board_y) ** 2;
 }
 
-export function taxi(p1: Apple, p2: Apple): number {
+export function taxi(expedition: Expedition, apple: Apple): number {
+	const p1 = expedition.snake.snakeFront.boardSpaceNode;
+	const p2 = apple;
 	return Math.abs(p1.board_x - p2.board_x) + Math.abs(p1.board_y - p2.board_y);
 }
 
-// const turnPenaltyTable = 
+export function turnCount(expedition: Expedition): number {
 
-export function stable(apple: Apple, frontSpace: BoardNode, backSpace: BoardNode, expedition: Expedition): number {
-	const zigzag = taxi(apple, frontSpace);
-	let turn_penalty = 0;
-
-	const buffer: DIRECTION[] = [];
-	// let directions = [...expedition.path];
-	// directions.reverse();
-
-	// if (directions.length < expedition.snake.length) {
-	// 	let snakeInstructions = getSnakeInstructions(expedition.snake);
-	// 	snakeInstructions = snakeInstructions.slice(directions.length - expedition.snake.length);
-	// 	directions.push(...snakeInstructions);
-	// }
-	let directions = [...getSnakeInstructions(expedition.snake)];
-	
-	const distanceToBack = taxi(frontSpace, backSpace);
-	const lengthBackImportance = lengthBackMultiplier(expedition.snake.length);
-	
-	// let last_dir = expedition.path[0];
+	const directions = expedition.path;
 	let straightCount = 0;
 	let turnCounts = 0;
-
-	// let currentSegment = expedition.snake.snakeFront.tailBoundNode as SnakeNode;
-	// let last_dir = expedition.snake.snakeFront.dirToTail;
-	// let i = 0;
+	
 	let lastDir = directions[0];
 	for (const d of directions.slice(1)) {
 		if (d == lastDir)
@@ -50,58 +31,72 @@ export function stable(apple: Apple, frontSpace: BoardNode, backSpace: BoardNode
 			straightCount = 0;
 		}
 	}
-	// while (true) {
-	// 	const d = currentSegment.dirToTail;
-	// 	i++;
 
-	// 	if (isSnakeEnd(currentSegment.tailBoundNode))
-	// 		break;
-
-	// 	currentSegment = currentSegment.tailBoundNode;
-
-	// 	// const d = directions[i];
-	// 	if (d == lastDir)
-	// 		straightCount++;
-	// 	else {
-	
-	// 		// Update last_dir
-	// 		lastDir = d;
-	
-	// 		// Up turn counts
-	// 		if (straightCount < 4)
-	// 			turnCounts++;
-			
-	// 		const segmentPenalty = segmentLengthPenalty(straightCount);
-	// 		const distanceFromStartMultiplier = distanceFromStartPenalty(i - straightCount);
-	// 		const distanceFromAppleMultiplier = distanceToApplePenalty(direct(apple, currentSegment.boardSpaceNode));
-	
-	// 		turn_penalty += segmentPenalty * distanceFromStartMultiplier// * distanceFromAppleMultiplier;
-	// 		// turn_penalty += segmentPenalty * distanceFromAppleMultiplier;
-	
-	// 		// Reset straight count
-	// 		straightCount = 0;
-			
-	// 		// // if (straightCount == 0 && base == 0)
-	// 		// // 	turn_penalty += 5000;
-	// 		// // else {
-	// 		// 	last_dir = d;
-	// 		// 	turnCounts++;
-	// 		// 	// turn_penalty += (expedition.snake.length - straightCount) * 2;
-	// 		// 	// turn_penalty += Math.sqrt((directions.length - straightCount) ** 2 / zigzag);
-	// 		// 	// break;
-	// 		// 	turn_penalty +=( (expedition.snake.length / straightCount) - 1) ** 2;
-	// 		// 	straightCount = 0;
-	// 		// // }
-	// 	}
-	// }
-
-	// for (let i = 0; i < directions.length; i++) {
-	// }
-	// turn_penalty +=( (expedition.snake.length / straightCount) - 1) ** 2;
-	// turn_penalty = turn_penalty;
-	
-	return turnCounts + zigzag + distanceToBack/4// - (1 - distanceToBack / expedition.snake.length);
+	return turnCounts;
 }
+
+export function distToTail(expedition: Expedition): number {
+	const back = expedition.snake.snakeBack.boardSpaceNode;
+	return taxi(expedition, back);
+}
+
+export function projection(expedition: Expedition, apple: Apple, useMin: boolean) {
+	const front = expedition.snake.snakeFront.boardSpaceNode;
+	const x = Math.abs(front.board_x - apple.board_x);
+	const y = Math.abs(front.board_y - apple.board_y);
+	if (useMin)
+		return Math.min(x, y);
+	else
+		return Math.max(x, y);
+}
+
+export function curvy(expedition: Expedition, apple: Apple): number {
+	
+	let directions = [...getSnakeInstructions(expedition.snake)];
+	
+	let turnPenalty = 0;
+	let straightCount = 0;
+
+	let lastDir = directions[0];
+	for (const d of directions.slice(1)) {
+		if (d == lastDir)
+			straightCount++;
+		
+		else {
+			if (straightCount < 5)
+				turnPenalty += (4 - straightCount);
+
+			lastDir = d;
+			straightCount = 0;
+		}
+	}
+	
+	return turnPenalty;
+}
+
+export function straight(expedition: Expedition, apple: Apple): number {
+	
+	let directions = [...getSnakeInstructions(expedition.snake)];
+	
+	let turnBonus = 0;
+	let straightCount = 0;
+
+	let lastDir = directions[0];
+	for (const d of directions.slice(1)) {
+		if (d == lastDir)
+			straightCount++;
+
+		else {
+			if (straightCount > 8)
+				turnBonus += straightCount / 5
+
+			lastDir = d;
+			straightCount = 0;
+		}
+	}
+	return turnBonus;
+}
+	
 
 function segmentLengthPenalty(x: number): number {
 	return Math.max(0, -(1.3 ** x)+5.39063);
