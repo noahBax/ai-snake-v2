@@ -14,5 +14,6 @@ declare global {
 		frameBufferIndex: number;
 		duplicateBoard: CompassNode[];
 		expandAtNode;
+		attempts: number;
 	}
 }

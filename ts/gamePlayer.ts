@@ -53,6 +53,8 @@ export function init() {
 
 	window.snakeDrawBuffer = snakeDrawBuffer;
 
+	window.attempts = 0;
+
 	initDrawingTools(BOARD_WIDTH, BOARD_HEIGHT, DRAW_NODE_SIZE);
 	initController();
 	initFrameManager();

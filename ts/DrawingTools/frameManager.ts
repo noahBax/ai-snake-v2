@@ -9,17 +9,23 @@ import { clearGameCanvas } from "./clearGameCanvas.js";
 var frameSkipCount = 0;
 var waitFrames = frameSkipCount;
 var frameBufferIndex = 0;
+var planningAttempts: HTMLSpanElement;
+
 export function lowerIndex() {
 	frameBufferIndex = Math.max(0, frameBufferIndex - 1);
 }
 export function upperIndex() {
-	frameBufferIndex = Math.min(frameBufferIndex + 1, snakeDrawBuffer.length);
+	frameBufferIndex = Math.min(frameBufferIndex + 1, snakeDrawBuffer.length-1);
+}
+export function refreshIndex(): void {
+	frameBufferIndex = snakeDrawBuffer.length - 1;
 }
 
 const commentEle: HTMLSpanElement = document.getElementById('frameComment');
 
 export function initFrameManager(): void {
 	window.frameBufferIndex = frameBufferIndex;
+	planningAttempts = document.getElementById("planningAttempts") as HTMLSpanElement
 }
 
 export function frameHandler(ts: number): void {
@@ -34,6 +40,7 @@ export function frameHandler(ts: number): void {
 	waitFrames = frameSkipCount;
 	
 	if (snakeDrawBuffer.length > frameBufferIndex) {
+		planningAttempts.textContent = '' + window.attempts;
 		// const frame = snakeDrawBuffer.shift();
 		const frame = snakeDrawBuffer[frameBufferIndex];
 		if (gameActive) {
