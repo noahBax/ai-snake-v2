@@ -75,6 +75,31 @@ export function init() {
 
 }
 
+export async function customTick() {
+
+	while (keysBuffer.length > 0) {
+		consumeKeyBuffer(snakeSummary);
+		snakeSummary = moveSnake(snakeSummary);
+	}
+
+	snakeSummary = incrementSnake(snakeSummary);
+	spawnApple(snakeSummary, appleNow);
+
+	const e = exploreSnake(snakeSummary, appleNow);
+	if (e?.path.length > 0) {
+		
+		getPathFromExpedition(e, keysBuffer);
+
+
+
+	} else {
+		gameRunning.innerText = 'false';
+		gameActive = false;
+	}
+	snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
+	unlock_tick();
+}
+
 export async function snakeTickFunction() {
 
 	if (keysBuffer.length == 0) {
