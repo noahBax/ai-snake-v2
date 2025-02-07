@@ -1,6 +1,6 @@
 import Apple from "../Board/apple.js";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../preferences.js";
-import { BoardNode, GridSpot, SnakeNode, SnakeSummary } from "../snakeNodes.js";
+import { BoardNode, GridSpot, isSnakeEnd, SnakeNode, SnakeSummary } from "../snakeNodes.js";
 
 abstract class InteractiveGrid {
 	abstract getValue(boardNode: GridSpot): number;
@@ -40,25 +40,28 @@ export class SnakePathGrid extends InteractiveGrid {
 
 	nodeBonuses: number[];
 
-	constructor(snakeSummary: SnakeSummary, decrementPerSegment=0.1) {
+	constructor(snakeSummary: SnakeSummary, decrementPerSegment=0.1, falloffFactor=1) {
 		super();
 
 		this.nodeBonuses = createEmptyGrid();
 
 		// Iterate up the snake and fill in the board
-		let nextValue = -decrementPerSegment;
-		let currentNode = snakeSummary.snakeBack;
+		let dec = decrementPerSegment;
+		let nextValue = -dec;
+		let currentNode = snakeSummary.snakeFront;
 
 		while (true) {
 
 			const index = getIndex(currentNode.boardSpaceNode);
 			this.nodeBonuses[index] = nextValue;
-			nextValue -= decrementPerSegment;
+			nextValue -= dec;
+			dec *= falloffFactor;
 
-			if (currentNode.headBoundNode.isEnd)
+
+			if (isSnakeEnd(currentNode.tailBoundNode))
 				break;
 			else
-				currentNode = currentNode.headBoundNode as SnakeNode;
+				currentNode = currentNode.tailBoundNode;
 		}
 	}
 
@@ -80,12 +83,10 @@ export class AppleDistanceGrid extends InteractiveGrid {
 		for (let i = 0; i < this.nodeDistances.length; i++) {
 			
 			const gridSpot = getGridSpot(i);
-			const distance = Math.sqrt((gridSpot.board_x - apple.board_x) ** 2 + (gridSpot.board_y - apple.board_y) ** 2)
+			const distance = Math.abs(gridSpot.board_x - apple.board_x) + Math.abs(gridSpot.board_y - apple.board_y)
 			
-			this.nodeDistances[i] = distance
+			this.nodeDistances[i] = distance - (BOARD_WIDTH+BOARD_HEIGHT)/2;
 		}
-
-		console.log(this.nodeDistances);
 
 	}
 	
@@ -99,7 +100,7 @@ function createEmptyGrid(): number[] {
 
 	const gridSize = BOARD_WIDTH * BOARD_HEIGHT;
 	const ret = [];
-	ret[gridSize] = 0;
+	ret[gridSize-1] = 0;
 	ret.fill(0, 0);
 	
 	return ret;
