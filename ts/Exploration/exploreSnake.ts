@@ -3,18 +3,16 @@ import findBoardRelation from "../Board/findBoardRelation.js";
 import { GridSpot, SnakeSummary } from "../snakeNodes.js";
 import Expedition from "./expedition.js";
 import frontCanSeeSnakeTail from "./Rules/frontCanSeeSnakeTail.js";
-import { snakeDrawBuffer } from "../DrawingTools/snakeDrawBuffer.js";
-import { upperIndex } from "../DrawingTools/frameManager.js";
 import expandAtNode from "./expandAtNode.js";
 import frontNotEnclosed from "./Rules/frontNotEnclosed.js";
 import * as utility from "../utilityFunctions/utilityFunctions.js";
 import * as board from "../utilityFunctions/boardHeuristics.js";
-import { ATTEMPT_LIMIT, BOARD_WIDTH } from "../preferences.js";
+import { ATTEMPT_LIMIT, BOARD_HEIGHT, BOARD_WIDTH } from "../preferences.js";
 import { FamilyNode } from "./LineageManager/lineage.js";
+import findGroups from "../Board/findGroups.js";
 
 export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): Expedition {
 
-	// console.clear();
 	
 	// Start exploring from the initial point
 	let goalMet = false;
@@ -25,7 +23,7 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 
 	const gridPackage: GridPackage = {
 		avoidance: new board.AvoidanceGrid(),
-		snakeGrid: new board.SnakePathGrid(snakeSummary, 0.07),
+		snakeGrid: new board.SnakePathGrid(snakeSummary, 0.2),
 		appleGrid: new board.AppleDistanceGrid(apple),
 	}
 
@@ -54,7 +52,7 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 			return empty;
 		}
 
-		gridPackage.avoidance.coolDown();
+		// gridPackage.avoidance.coolDown();
 		
 		// Take the highest man off the stack
 		const bestPath = expeditions.reduce((a,b) => comparePaths(a, b, gridPackage));
@@ -73,8 +71,8 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		// 	return;
 		// }
 
-		upperIndex();
-		snakeDrawBuffer.push([bestPath.snake, {...apple}, -1, bestPath.path]);
+		// upperIndex();
+		// snakeDrawBuffer.push([bestPath.snake, {...apple}, -1, bestPath.path]);
 		
 		// Check to see if the path with the best utility has reached the apple
 		if (bestPath.atApple) {
@@ -101,7 +99,6 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 
 		gridPackage.avoidance.visitNode(bestPath.snake.snakeFront.boardSpaceNode, 3);
 		
-		empty.lineageNode.forgiveDebt(0.2);
 
 		const spot = bestPath.snake.snakeFront.boardSpaceNode;
 		const spotIndex = spot.board_x + spot.board_y * BOARD_WIDTH;
@@ -120,6 +117,8 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		
 		// Calculate utility
 		for (const p of pioneers){
+			const smallGroups = findGroups(p.snake).sort( (a, b) => b.length - a.length);
+			// const smallGroups = findGroups(p.snake).filter(g => g.length == 1);
 			// p.utility = utility.stable(p, apple) + Math.cbrt(p.lineageNode.cumulativeDebt);
 
 			// const distanceEffect = (1 - 1/utility.taxi(p, apple));  // Gets closer to 1 as taxi goes to 0
@@ -127,6 +126,10 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 			
 			p.utility   = 0
 						+ utility.curvy(p, apple)
+						- Math.sqrt(smallGroups[0]?.length ?? 0)
+						// + (smallGroups.at(-1)?.length ?? 0)
+						// + Math.sqrt(p.path.length)
+						// + smallGroups.length * 2;
 						// - utility.straight(p, apple)
 						// + logLineageDebt
 						// + utility.turnCount(p) / distanceEffect * logLineageDebt
@@ -165,6 +168,10 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 }
 
 function checkMeetsRules(e: Expedition): number {
+
+	if (e.snake.length == BOARD_WIDTH * BOARD_HEIGHT - 1)
+		return -2;
+	
 	const rules: ((e: Expedition) => boolean)[] = [
 		frontCanSeeSnakeTail,
 		// frontCanSeeSnakeBack,
