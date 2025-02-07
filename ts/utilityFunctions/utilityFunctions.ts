@@ -63,8 +63,8 @@ export function curvy(expedition: Expedition, apple: Apple): number {
 			straightCount++;
 		
 		else {
-			if (straightCount < 5)
-				turnPenalty += (4 - straightCount);
+			if (straightCount < 4)
+				turnPenalty += (3 - straightCount);
 
 			lastDir = d;
 			straightCount = 0;
