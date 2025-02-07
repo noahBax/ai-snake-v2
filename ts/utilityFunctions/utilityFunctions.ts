@@ -50,7 +50,7 @@ export function projection(expedition: Expedition, apple: Apple, useMin: boolean
 		return Math.max(x, y);
 }
 
-export function curvy(expedition: Expedition, apple: Apple): number {
+export function curvy(expedition: Expedition, lengthBack=11): number {
 	
 	let directions = [...getSnakeInstructions(expedition.snake)];
 	
@@ -58,7 +58,7 @@ export function curvy(expedition: Expedition, apple: Apple): number {
 	let straightCount = 0;
 
 	let lastDir = directions[0];
-	for (const d of directions.slice(1)) {
+	for (const d of directions.slice(1, lengthBack)) {
 		if (d == lastDir)
 			straightCount++;
 		
@@ -74,7 +74,7 @@ export function curvy(expedition: Expedition, apple: Apple): number {
 	return turnPenalty;
 }
 
-export function straight(expedition: Expedition, apple: Apple): number {
+export function straight(expedition: Expedition, lengthBack=11): number {
 	
 	let directions = [...getSnakeInstructions(expedition.snake)];
 	
@@ -82,7 +82,7 @@ export function straight(expedition: Expedition, apple: Apple): number {
 	let straightCount = 0;
 
 	let lastDir = directions[0];
-	for (const d of directions.slice(1)) {
+	for (const d of directions.slice(1, 11)) {
 		if (d == lastDir)
 			straightCount++;
 
@@ -94,6 +94,10 @@ export function straight(expedition: Expedition, apple: Apple): number {
 			straightCount = 0;
 		}
 	}
+
+	if (straightCount > 8)
+		turnBonus += straightCount / 5;
+
 	return turnBonus;
 }
 	
