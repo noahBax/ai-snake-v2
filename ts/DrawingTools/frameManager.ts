@@ -1,4 +1,4 @@
-import { customTick, gameActive, snakeTickFunction } from "../gamePlayer.js";
+import { quickTick, gameActive, snakeTickFunction } from "../gamePlayer.js";
 import { snakeDrawBuffer } from "./snakeDrawBuffer.js";
 import { lock_tick, TICK_LOCK } from "./frameLocks.js";
 import Apple from "../Board/apple.js";
@@ -58,8 +58,8 @@ export function frameHandler(ts: number): void {
 	} else
 	if (!TICK_LOCK) {
 		lock_tick();
-		snakeTickFunction();
-		// customTick();
+		// snakeTickFunction();
+		quickTick();
 	}
 	
 	requestAnimationFrame(frameHandler);

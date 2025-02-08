@@ -32,6 +32,8 @@ const gameRunning: HTMLSpanElement = document.getElementById('gameRunning');
 export var spriteSheetImage: HTMLImageElement;
 export var spriteSheetExploringImage: HTMLImageElement;
 export var spriteSheetBadImage: HTMLImageElement;
+var lengthEle: HTMLSpanElement;
+
 
 export function init() {
 
@@ -41,6 +43,8 @@ export function init() {
 	
 	// Populate a board and return a list of nodes
 	const boardNodes: BoardNode[] = createBoard(BOARD_WIDTH, BOARD_HEIGHT);
+
+	lengthEle = document.getElementById('numSnakeNodes');
 
 	// Create a template snake. Template is 2 nodes long with 1 head and 1 tail.
 	// This function returns the front of the snake and NOT the head. So it does
@@ -75,27 +79,28 @@ export function init() {
 
 }
 
-export async function customTick() {
+export async function quickTick() {
+
+	lengthEle.innerText = '' + snakeSummary.length;
 
 	while (keysBuffer.length > 0) {
 		consumeKeyBuffer(snakeSummary);
-		snakeSummary = moveSnake(snakeSummary);
+		if (keysBuffer.length > 0)
+			snakeSummary = moveSnake(snakeSummary);
 	}
 
 	snakeSummary = incrementSnake(snakeSummary);
 	spawnApple(snakeSummary, appleNow);
 
 	const e = exploreSnake(snakeSummary, appleNow);
-	if (e?.path.length > 0) {
-		
-		getPathFromExpedition(e, keysBuffer);
+	getPathFromExpedition(e, keysBuffer);
 
-
-
-	} else {
-		gameRunning.innerText = 'false';
+	if (keysBuffer.length == 0) {
+		gameRunning.innerText = 'FALSE';
 		gameActive = false;
 	}
+
+	
 	snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
 	unlock_tick();
 }
