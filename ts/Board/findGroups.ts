@@ -18,12 +18,14 @@ export default function findGroups(snakeSummary: SnakeSummary): BoardNode[][] {
 		
 		// Exploration stack
 		const currentStack = [toExplore.pop()];
+		exploredNodes.push(currentStack[0]);
 
 		// While there are items in the stack we haven't explored
 		while (currentStack.length > 0) {
 
 			// Pop any guy off the stack
 			const n = currentStack.pop();
+			group.push(n);
 
 			// Examine neighbors
 			const neighbors = [n.north, n.east, n.south, n.west];
@@ -32,7 +34,6 @@ export default function findGroups(snakeSummary: SnakeSummary): BoardNode[][] {
 					currentStack.push(i);
 					toExplore.splice(toExplore.indexOf(i), 1);
 					exploredNodes.push(i);
-					group.push(i);
 				}
 			}
 		}
