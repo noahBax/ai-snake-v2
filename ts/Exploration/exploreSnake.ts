@@ -14,7 +14,6 @@ import { upperIndex } from "../DrawingTools/frameManager.js";
 import { snakeDrawBuffer } from "../DrawingTools/snakeDrawBuffer.js";
 import { EMPTY_NODE } from "../Board/createBoard.js";
 import groupLimit from "./Rules/groupLimit.js";
-import passesHamiltonTest from "./Rules/passesHamiltonTest.js";
 import { IN_TRAINING } from "../trainingModule.js";
 import { incrementAttempts } from "../performanceTracking.js";
 import Configuration from "./configuration.js";
