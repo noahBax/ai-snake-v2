@@ -1,4 +1,5 @@
 import Apple from "../Board/apple.js";
+import Configuration from "../Exploration/configuration.js";
 import Expedition from "../Exploration/expedition.js";
 import getSnakeInstructions from "../Snake/getSnakeInstructions.js";
 
@@ -50,7 +51,7 @@ export function projection(expedition: Expedition, apple: Apple, useMin: boolean
 		return Math.max(x, y);
 }
 
-export function curvy(expedition: Expedition, lengthBack=11): number {
+export function curvy(expedition: Expedition, config: Configuration): number {
 	
 	let directions = [...getSnakeInstructions(expedition.snake)];
 	
@@ -58,13 +59,13 @@ export function curvy(expedition: Expedition, lengthBack=11): number {
 	let straightCount = 0;
 
 	let lastDir = directions[0];
-	for (const d of directions.slice(1, lengthBack)) {
+	for (const d of directions.slice(1, config.utilityCurvyLengthBack)) {
 		if (d == lastDir)
 			straightCount++;
 		
 		else {
-			if (straightCount < 4)
-				turnPenalty += (3 - straightCount);
+			if (straightCount < config.utilityCurvyStraightLength)
+				turnPenalty += (config.utilityCurvyTurnPenaltyDefault - straightCount);
 
 			lastDir = d;
 			straightCount = 0;
@@ -74,29 +75,30 @@ export function curvy(expedition: Expedition, lengthBack=11): number {
 	return turnPenalty;
 }
 
-export function straight(expedition: Expedition, lengthBack=11): number {
+export function straight(expedition: Expedition, config: Configuration): number {
 	
-	let directions = [...getSnakeInstructions(expedition.snake)];
+	const lengthBack = Math.abs(Math.floor(config.utilityStraightLengthBack));
+	const directions = [...getSnakeInstructions(expedition.snake)];
 	
 	let turnBonus = 0;
 	let straightCount = 0;
 
 	let lastDir = directions[0];
-	for (const d of directions.slice(1, 11)) {
+	for (const d of directions.slice(1, lengthBack)) {
 		if (d == lastDir)
 			straightCount++;
 
 		else {
-			if (straightCount > 8)
-				turnBonus += straightCount / 5
+			if (straightCount > config.utilityStraightStraightLength)
+				turnBonus += straightCount / config.utilityStraightTurnBonusDivisor
 
 			lastDir = d;
 			straightCount = 0;
 		}
 	}
 
-	if (straightCount > 8)
-		turnBonus += straightCount / 5;
+	if (straightCount > config.utilityStraightStraightLength)
+		turnBonus += straightCount / config.utilityStraightTurnBonusDivisor;
 
 	return turnBonus;
 }

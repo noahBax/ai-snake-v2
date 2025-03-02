@@ -1,4 +1,5 @@
 import Apple from "../Board/apple.js";
+import Configuration from "../Exploration/configuration.js";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../preferences.js";
 import { BoardNode, GridSpot, isSnakeEnd, SnakeNode, SnakeSummary } from "../snakeNodes.js";
 
@@ -14,13 +15,10 @@ export class AvoidanceGrid extends InteractiveGrid {
 		this.nodeHistory = createEmptyGrid();
 	}
 
-	visitNode(gridSpot: GridSpot, penalty=1): void {
+	visitNode(gridSpot: GridSpot, configuration: Configuration): void {
 		const index = getIndex(gridSpot);
+		this.nodeHistory[index] += configuration.avoidanceVisitPenalty;
 
-		if (!this.nodeHistory[index])
-			this.nodeHistory[index] = penalty;
-		else
-			this.nodeHistory[index] += penalty;
 	}
 
 	getValue(gridSpot: GridSpot): number {
@@ -28,10 +26,14 @@ export class AvoidanceGrid extends InteractiveGrid {
 		return this.nodeHistory[index];
 	}
 
-	coolDown(amt=0.02): void {
+	coolDown(config: Configuration): void {
 
-		for (let i = 0; i < this.nodeHistory.length; i++)
-			this.nodeHistory[i] -= amt;	
+		for (let i = 0; i < this.nodeHistory.length; i++) {
+			this.nodeHistory[i] -= config.avoidanceCoolDown;	
+			// if (this.nodeHistory[i] < 0) {
+			// 	this.nodeHistory[i] = 0;
+			// }
+		}
 
 	}
 }
@@ -40,13 +42,13 @@ export class SnakePathGrid extends InteractiveGrid {
 
 	nodeBonuses: number[];
 
-	constructor(snakeSummary: SnakeSummary, decrementPerSegment=0.1, falloffFactor=1) {
+	constructor(snakeSummary: SnakeSummary, config: Configuration) {
 		super();
 
 		this.nodeBonuses = createEmptyGrid();
 
 		// Iterate up the snake and fill in the board
-		let dec = decrementPerSegment;
+		let dec = config.snakePathDecrement;
 		let nextValue = -dec;
 		let currentNode = snakeSummary.snakeFront;
 
@@ -55,7 +57,7 @@ export class SnakePathGrid extends InteractiveGrid {
 			const index = getIndex(currentNode.boardSpaceNode);
 			this.nodeBonuses[index] = nextValue;
 			nextValue -= dec;
-			dec *= falloffFactor;
+			dec *= config.snakePathFalloff;
 
 
 			if (isSnakeEnd(currentNode.tailBoundNode))
@@ -75,7 +77,7 @@ export class AppleDistanceGrid extends InteractiveGrid {
 
 	nodeDistances: number[];
 
-	constructor(apple: Apple) {
+	constructor(apple: Apple, config: Configuration) {
 		super();
 		this.nodeDistances = createEmptyGrid();
 
@@ -85,7 +87,8 @@ export class AppleDistanceGrid extends InteractiveGrid {
 			const gridSpot = getGridSpot(i);
 			const distance = Math.abs(gridSpot.board_x - apple.board_x) + Math.abs(gridSpot.board_y - apple.board_y)
 			
-			this.nodeDistances[i] = distance - (BOARD_WIDTH+BOARD_HEIGHT)/2;
+			// this.nodeDistances[i] = distance - (BOARD_WIDTH+BOARD_HEIGHT)/2;
+			this.nodeDistances[i] = distance * config.appleDistanceMultiplier;
 		}
 
 	}

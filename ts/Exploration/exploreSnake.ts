@@ -10,8 +10,16 @@ import * as board from "../utilityFunctions/boardHeuristics.js";
 import { ATTEMPT_LIMIT, BOARD_HEIGHT, BOARD_WIDTH } from "../preferences.js";
 import { FamilyNode } from "./LineageManager/lineage.js";
 import findGroups from "../Board/findGroups.js";
+import { upperIndex } from "../DrawingTools/frameManager.js";
+import { snakeDrawBuffer } from "../DrawingTools/snakeDrawBuffer.js";
+import { EMPTY_NODE } from "../Board/createBoard.js";
+import groupLimit from "./Rules/groupLimit.js";
+import passesHamiltonTest from "./Rules/passesHamiltonTest.js";
+import { IN_TRAINING } from "../trainingModule.js";
+import { incrementAttempts } from "../performanceTracking.js";
+import Configuration from "./configuration.js";
 
-export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): Expedition {
+export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple, config: Configuration): Expedition {
 
 	
 	// Start exploring from the initial point
@@ -23,11 +31,11 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 
 	const gridPackage: GridPackage = {
 		avoidance: new board.AvoidanceGrid(),
-		snakeGrid: new board.SnakePathGrid(snakeSummary, 0.2),
-		appleGrid: new board.AppleDistanceGrid(apple),
+		snakeGrid: new board.SnakePathGrid(snakeSummary, config),
+		appleGrid: new board.AppleDistanceGrid(apple, config),
 	}
 
-	console.log(gridPackage);
+	// console.log(gridPackage);
 
 	// Add in the 0-state
 	const empty: Expedition = {
@@ -46,30 +54,21 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 
 		
 		limit--;
-		window.attempts++;
+		incrementAttempts();
+		if (!IN_TRAINING)
+			window.attempts++;
 		
 		if (expeditions.length == 0) {
 			return empty;
 		}
 
-		// gridPackage.avoidance.coolDown();
+		gridPackage.avoidance.coolDown(config);
 		
 		// Take the highest man off the stack
 		const bestPath = expeditions.reduce((a,b) => comparePaths(a, b, gridPackage));
 		expeditions.splice(expeditions.indexOf(bestPath), 1);
 
 		findBoardRelation(bestPath.snake.snakeFront.boardSpaceNode, bestPath.snake.snakeFront.tailBoundNode.boardSpaceNode);
-
-		// // Check to see if it is a duplicate
-		// if (isDuplicate(duplicateBoard, bestPath)) {
-		// 	console.log('duped: ', JSON.stringify(bestPath.path));
-		// 	continue;
-		// }
-
-		// if (!isDuplicate(duplicateBoard, bestPath)) {
-		// 	console.error('BEEP');
-		// 	return;
-		// }
 
 		// upperIndex();
 		// snakeDrawBuffer.push([bestPath.snake, {...apple}, -1, bestPath.path]);
@@ -81,13 +80,14 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 			// Check to see that it passes all of the rules
 			const ruleBroken = checkMeetsRules(bestPath);
 			if (ruleBroken > 0) {
+				// upperIndex();
 				// snakeDrawBuffer.push([bestPath.snake, {...apple}, ruleBroken]);
-				console.log('Fail');
+				// console.log('Fail');
 				bestPath.lineageNode.incrementDebt(3, 0.95);
 				continue;
 			}
 
-			console.log(bestPath.path);
+			// console.log(bestPath.path);
 			
 			winner = bestPath;
 			bestPath.lineageNode.parent = false;
@@ -97,7 +97,7 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 			break;
 		}
 
-		gridPackage.avoidance.visitNode(bestPath.snake.snakeFront.boardSpaceNode, 3);
+		gridPackage.avoidance.visitNode(bestPath.snake.snakeFront.boardSpaceNode, config);
 		
 
 		const spot = bestPath.snake.snakeFront.boardSpaceNode;
@@ -118,19 +118,17 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		// Calculate utility
 		for (const p of pioneers){
 			const smallGroups = findGroups(p.snake).sort( (a, b) => b.length - a.length);
-			// const smallGroups = findGroups(p.snake).filter(g => g.length == 1);
-			// p.utility = utility.stable(p, apple) + Math.cbrt(p.lineageNode.cumulativeDebt);
+			const sizeOneGroups = findGroups(p.snake).filter(a => a.length == 1).length;
 
-			// const distanceEffect = (1 - 1/utility.taxi(p, apple));  // Gets closer to 1 as taxi goes to 0
-			// const curvyScore = utility.curvy(p, apple);
-			
 			p.utility   = 0
-						+ utility.curvy(p, apple)
-						- Math.sqrt(smallGroups[0]?.length ?? 0)
-						// + (smallGroups.at(-1)?.length ?? 0)
+						+ utility.curvy(p, config) * config.utilityCurvy
+						- Math.sqrt(smallGroups[0]?.length ?? 0) * config.largestGroupSize // largest group
+						// + smallGroups.length ** 2
+						// + Math.sqrt((smallGroups.at(-1)?.length ?? 0))
 						// + Math.sqrt(p.path.length)
 						// + smallGroups.length * 2;
-						// - utility.straight(p, apple)
+						+ sizeOneGroups * config.sizeOneGroups;
+						- utility.straight(p, config) * config.utilityStraight
 						// + logLineageDebt
 						// + utility.turnCount(p) / distanceEffect * logLineageDebt
 						// + utility.turnCount(p)
@@ -162,7 +160,8 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple): 
 		
 	}
 
-	window.duplicateBoard = duplicateBoard;
+	// if (!IN_TRAINING)
+	// 	window.duplicateBoard = duplicateBoard;
 
 	return winner;
 }
@@ -177,10 +176,13 @@ function checkMeetsRules(e: Expedition): number {
 		// frontCanSeeSnakeBack,
 		frontNotEnclosed,
 		// tailNotSnakeFrontNeighbor,
+		// groupLimit,
+		// passesHamiltonTest,
 	];
 
 	for (let r = 0; r < rules.length; r++) {
 		if (!rules[r](e)) {
+			// console.log('fail');
 			return r+1;
 		}
 	}

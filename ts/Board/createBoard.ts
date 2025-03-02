@@ -8,7 +8,6 @@ export var EMPTY_NODE: BoardNode = {
 	board_x: -1,
 	board_y: -1,
 };
-window.emptyNode = EMPTY_NODE;
 
 export default function createBoard(width: number, height: number): BoardNode[] {
 
