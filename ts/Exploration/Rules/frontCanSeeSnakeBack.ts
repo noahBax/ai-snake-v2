@@ -19,7 +19,6 @@ export default function frontCanSeeSnakeBack(e: Expedition): boolean {
 	const startNode: BoardNode = e.snake.snakeFront.boardSpaceNode;
 	// Try to find the back...
 	const endNode: BoardNode = e.snake.snakeBack.boardSpaceNode;
-	console.log(`(${startNode.board_x}, ${startNode.board_y}) - (${endNode.board_x}, ${endNode.board_y})`);
 
 	// List of nodes to explore
 	const toExplore: BoardNode[] = [startNode];

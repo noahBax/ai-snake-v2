@@ -1,6 +1,5 @@
 import { quickTick, gameActive, snakeTickFunction } from "../gamePlayer.js";
 import { snakeDrawBuffer } from "./snakeDrawBuffer.js";
-import { lock_tick, TICK_LOCK } from "./frameLocks.js";
 import Apple from "../Board/apple.js";
 import { drawSnakeBody, drawHead, drawApple, drawSnakeTail } from "../drawThings.js";
 import { SnakeSummary } from "../snakeNodes.js";
@@ -21,9 +20,10 @@ export function refreshIndex(): void {
 	frameBufferIndex = snakeDrawBuffer.length - 1;
 }
 
-const commentEle: HTMLSpanElement = document.getElementById('frameComment');
+var commentEle: HTMLSpanElement;
 
 export function initFrameManager(): void {
+	commentEle = document.getElementById('frameComment');
 	window.frameBufferIndex = frameBufferIndex;
 	planningAttempts = document.getElementById("planningAttempts") as HTMLSpanElement
 }
@@ -56,11 +56,8 @@ export function frameHandler(ts: number): void {
 		// lock_tick();
 
 	} else
-	if (!TICK_LOCK) {
-		lock_tick();
-		// snakeTickFunction();
-		quickTick();
-	}
+		snakeTickFunction();
+		// quickTick();
 	
 	requestAnimationFrame(frameHandler);
 }

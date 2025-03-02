@@ -1,20 +1,23 @@
 import Apple, { goingToEatApple, spawnApple } from "./Board/apple.js";
 import createBoard, { EMPTY_NODE } from "./Board/createBoard.js";
-import { unlock_tick } from "./DrawingTools/frameLocks.js";
+import findGroups from "./Board/findGroups.js";
 import { initFrameManager } from "./DrawingTools/frameManager.js";
 import initDrawingTools from "./DrawingTools/initDrawingTools.js";
 import { snakeDrawBuffer } from "./DrawingTools/snakeDrawBuffer.js";
+import expandAtNode from "./Exploration/expandAtNode.js";
 import Expedition from "./Exploration/expedition.js";
 import exploreSnake from "./Exploration/exploreSnake.js";
 import getPathFromExpedition from "./Exploration/getPathFromExpedition.js";
+import { globalMoves, increaseMoves } from "./performanceTracking.js";
 import { consumeKeyBuffer, initController, keysBuffer } from "./personalController.js";
-import { BOARD_WIDTH, BOARD_HEIGHT, DRAW_NODE_SIZE } from "./preferences.js";
+import { BOARD_WIDTH, BOARD_HEIGHT, DRAW_NODE_SIZE, defaultConfig } from "./preferences.js";
 import createSnake from "./Snake/createSnake.js";
 import createSnakeCopy from "./Snake/createSnakeCopy.js";
 import goingToEatSelf from "./Snake/goingToEatSelf.js";
 import incrementSnake from "./Snake/incrementSnake.js";
 import moveSnake from "./Snake/moveSnake.js";
 import { SnakeEnd, SnakeSummary, BoardNode, isSnakeEnd } from "./snakeNodes.js";
+import { enableTraining, IN_TRAINING } from "./trainingModule.js";
 
 var snakeSummary: SnakeSummary;
 
@@ -28,60 +31,63 @@ var appleSoon: Apple = {
 };
 
 export var gameActive = true;
-const gameRunning: HTMLSpanElement = document.getElementById('gameRunning');
+var gameRunning: HTMLSpanElement;
 export var spriteSheetImage: HTMLImageElement;
 export var spriteSheetExploringImage: HTMLImageElement;
 export var spriteSheetBadImage: HTMLImageElement;
 var lengthEle: HTMLSpanElement;
 
+export function trainerInit(): void {
+	enableTraining();
+	createInitialSnake();
+	pathToFirstApple();
+}
 
-export function init() {
+export function init(): void {
+	initDOMStuff();
+	createInitialSnake();
+	pathToFirstApple();
+}
 
+function initDOMStuff(): void {
 	spriteSheetImage = document.getElementById("spriteSheet") as HTMLImageElement;
 	spriteSheetExploringImage = document.getElementById("spriteSheetExploring") as HTMLImageElement;
 	spriteSheetBadImage = document.getElementById("spriteSheetBad") as HTMLImageElement;
-	
-	// Populate a board and return a list of nodes
-	const boardNodes: BoardNode[] = createBoard(BOARD_WIDTH, BOARD_HEIGHT);
-
+	gameRunning = document.getElementById('gameRunning');
 	lengthEle = document.getElementById('numSnakeNodes');
 
-	// Create a template snake. Template is 2 nodes long with 1 head and 1 tail.
-	// This function returns the front of the snake and NOT the head. So it does
-	// have a headBoundNode.
-	snakeSummary = createSnake(boardNodes);
-
-	console.log("Snakehead", snakeSummary.snakeHead);
-
 	window.snakeSummary = snakeSummary;
-
 	window.snakeDrawBuffer = snakeDrawBuffer;
-
 	window.attempts = 0;
+	window.emptyNode = EMPTY_NODE;
+	window.tick = snakeTickFunction;
+	window.findGroups = findGroups;
+	window.expandAtNode = expandAtNode;
+
 
 	initDrawingTools(BOARD_WIDTH, BOARD_HEIGHT, DRAW_NODE_SIZE);
 	initController();
 	initFrameManager();
+}
 
+function createInitialSnake(): void {
+	const boardNodes: BoardNode[] = createBoard(BOARD_WIDTH, BOARD_HEIGHT);
+	snakeSummary = createSnake(boardNodes);
+}
+
+function pathToFirstApple(): void {
 	// Spawn the apple
 	spawnApple(snakeSummary, appleNow);
 
-	// Choose a place for the future apple
-	// spawnApple()
-
 	// Determine path
-	const e = exploreSnake(createSnakeCopy(snakeSummary), appleNow);
+	const e = exploreSnake(createSnakeCopy(snakeSummary), appleNow, defaultConfig);
 	getPathFromExpedition(e, keysBuffer);
-
-	// GAME_LOOP = setInterval(tick, 125);
-	unlock_tick();
-	// requestAnimationFrame(snakeTickFunction);
-
 }
 
-export async function quickTick() {
+export function quickTick() {
 
-	lengthEle.innerText = '' + snakeSummary.length;
+	if (!IN_TRAINING)
+		lengthEle.innerText = '' + snakeSummary.length;
 
 	while (keysBuffer.length > 0) {
 		consumeKeyBuffer(snakeSummary);
@@ -92,20 +98,22 @@ export async function quickTick() {
 	snakeSummary = incrementSnake(snakeSummary);
 	spawnApple(snakeSummary, appleNow);
 
-	const e = exploreSnake(snakeSummary, appleNow);
+	const e = exploreSnake(snakeSummary, appleNow, defaultConfig);
 	getPathFromExpedition(e, keysBuffer);
 
 	if (keysBuffer.length == 0) {
-		gameRunning.innerText = 'FALSE';
+		if (!IN_TRAINING)
+			gameRunning.innerText = 'FALSE';
 		gameActive = false;
-	}
+		console.log('There are', globalMoves, 'moves');
+	} else
+		increaseMoves(keysBuffer.length);
 
 	
 	snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
-	unlock_tick();
 }
 
-export async function snakeTickFunction() {
+export function snakeTickFunction() {
 
 	if (keysBuffer.length == 0) {
 		console.log('Key buffer empty, Game Over');
@@ -153,17 +161,16 @@ export async function snakeTickFunction() {
 		}
 		
 		// Determine path
-		const e = exploreSnake(snakeSummary, appleNow);
+		const e = exploreSnake(snakeSummary, appleNow, defaultConfig);
 		getPathFromExpedition(e, keysBuffer);
+		increaseMoves(keysBuffer.length);
 	} else {
 		snakeSummary = moveSnake(snakeSummary);
 	}
 
 	// Redraw
 	snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
-	unlock_tick();
 }
 
-window.tick = snakeTickFunction;
 
 

@@ -1,6 +1,5 @@
 import accessNodeRelation from "./Board/accessNodeRelation.js";
 import findBoardRelation from "./Board/findBoardRelation.js";
-import { unlock_tick } from "./DrawingTools/frameLocks.js";
 import { lowerIndex, refreshIndex, upperIndex } from "./DrawingTools/frameManager.js";
 import { DIRECTION, SnakeSummary } from "./snakeNodes.js";
 
@@ -93,7 +92,6 @@ export function initController() {
 				break;
 
 			case " ":
-				unlock_tick();
 				console.log('unlocksing');
 				break;
 			

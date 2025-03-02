@@ -42,9 +42,10 @@ export function isDuplicate(duplicateBoard: CompassNode[], expedition: Expeditio
 			currentNode.dirs[dir] = fillOutRemainingTree(snakeInstructions);
 			return false;
 		}
-		currentNode = currentNode.dirs[dir];
+		currentNode = currentNode.dirs[dir] as CompassNode;
 	}
 
+	// console.log('duped');
 	return true
 }
 

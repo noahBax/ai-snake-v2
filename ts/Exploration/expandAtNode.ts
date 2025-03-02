@@ -11,7 +11,6 @@ import { FamilyNode } from "./LineageManager/lineage.js";
 
 
 export default function expandAtNode(expedition: Expedition, apple: Apple, duplicateBoard?: CompassNode[]): Expedition[] {
-	window.expandAtNode = expandAtNode;
 
 	const front = expedition.snake.snakeFront.boardSpaceNode;
 	const back = expedition.snake.snakeBack.boardSpaceNode;

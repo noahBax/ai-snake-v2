@@ -15,5 +15,6 @@ declare global {
 		duplicateBoard: CompassNode[];
 		expandAtNode;
 		attempts: number;
+		findGroups;
 	}
 }
