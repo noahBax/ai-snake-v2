@@ -1,20 +1,16 @@
 import { gameActive, quickTick, trainerInit } from "./gamePlayer.js";
-import { globalMoves, increaseMoves } from "./performanceTracking.js";
-import fs from 'node:fs';
-import { argv } from "node:process";
+import { globalMoves } from "./performanceTracking.js";
+import { defaultConfig } from "./preferences.js";
 
 function main(): void {
-	trainerInit();
-
-	// console.log(argv);
-	// const params = argv[2].split(' ');
+	trainerInit(defaultConfig);
 
 	// Training loop
 	while (gameActive) {
-		quickTick();
+		quickTick(defaultConfig);
 	}
 
-	fs.writeFileSync('result.txt', '' + globalMoves);
+	console.log(globalMoves);
 }
 
 main();

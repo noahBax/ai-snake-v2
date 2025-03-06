@@ -1,3 +1,4 @@
 # js outdir
 js
 .vscode
+node_modules

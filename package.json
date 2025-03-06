@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node js/testInstance.js",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
   },
   "repository": {
     "type": "git",
@@ -16,5 +18,8 @@
   },
   "homepage": "https://github.com/noahBax/ai-snake-v2#readme",
   "description": "",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@types/node": "^22.13.9"
+  }
 }
