@@ -7,3 +7,8 @@ export var globalMoves = 0;
 export function increaseMoves(amt: number): void {
 	globalMoves += amt;
 }
+
+export var globalProgress = 0;
+export function incrementProgress(): void {
+	globalProgress++;
+}

@@ -1,4 +1,5 @@
 import accessNodeRelation from "../Board/accessNodeRelation.js";
+import { incrementProgress } from "../performanceTracking.js";
 import { BOARD_WIDTH, BOARD_HEIGHT } from "../preferences.js";
 import { SnakeNode, SnakeEnd, BoardNode, SnakeSummary, DIRECTION } from "../snakeNodes.js";
 
@@ -18,7 +19,7 @@ export default function createSnake(boardNodes: BoardNode[]): SnakeSummary {
 	}
 	
 	const snakeTail: SnakeEnd = {
-		boardSpaceNode: seg3,
+		boardSpaceNode: seg4,
 		isEnd: true,
 		dirToTail: DIRECTION.west,
 	}
@@ -46,6 +47,11 @@ export default function createSnake(boardNodes: BoardNode[]): SnakeSummary {
 	}
 	snakeFront.tailBoundNode = snakeMid;
 	snakeMid.tailBoundNode = snakeBack
+
+	// Start out the global progress counter correctly
+	incrementProgress();
+	incrementProgress();
+	incrementProgress();
 
 	return {
 		length: 3,
