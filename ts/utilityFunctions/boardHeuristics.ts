@@ -30,9 +30,9 @@ export class AvoidanceGrid extends InteractiveGrid {
 
 		for (let i = 0; i < this.nodeHistory.length; i++) {
 			this.nodeHistory[i] -= config.avoidanceCoolDown;	
-			// if (this.nodeHistory[i] < 0) {
-			// 	this.nodeHistory[i] = 0;
-			// }
+			if (this.nodeHistory[i] < 0) {
+				this.nodeHistory[i] = 0;
+			}
 		}
 
 	}
