@@ -6,7 +6,7 @@ export {};
 
 declare global {
 	interface Window { 
-		tick: VoidFunction;
+		tick;
 		snakeSummary: SnakeSummary;
 		emptyNode: BoardNode;
 		keysBuffer: DIRECTION[];
