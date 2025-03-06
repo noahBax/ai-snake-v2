@@ -53,13 +53,14 @@ export function projection(expedition: Expedition, apple: Apple, useMin: boolean
 
 export function curvy(expedition: Expedition, config: Configuration): number {
 	
-	let directions = [...getSnakeInstructions(expedition.snake)];
+	const lengthBack = Math.abs(Math.floor(config.utilityCurvyLengthBack));
+	const directions = [...getSnakeInstructions(expedition.snake)];
 	
 	let turnPenalty = 0;
 	let straightCount = 0;
 
 	let lastDir = directions[0];
-	for (const d of directions.slice(1, config.utilityCurvyLengthBack)) {
+	for (const d of directions.slice(1, lengthBack)) {
 		if (d == lastDir)
 			straightCount++;
 		

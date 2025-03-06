@@ -51,7 +51,6 @@ export function spawnApple(snakeSummary: SnakeSummary, apple: Apple, antiApple?:
 	}
 
 	if (candidates.length == 0) {
-		console.log('Finished');
 		apple.board_x = -1
 		apple.board_y = -1
 		return;
