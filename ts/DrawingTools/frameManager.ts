@@ -1,14 +1,17 @@
 import { quickTick, gameActive, snakeTickFunction } from "../gamePlayer.js";
 import { snakeDrawBuffer } from "./snakeDrawBuffer.js";
 import Apple from "../Board/apple.js";
-import { drawSnakeBody, drawHead, drawApple, drawSnakeTail } from "../drawThings.js";
+import { drawSnakeBody, drawHead, drawApple } from "../drawThings.js";
 import { SnakeSummary } from "../snakeNodes.js";
 import { clearGameCanvas } from "./clearGameCanvas.js";
+import { defaultConfig } from "../preferences.js";
+import { globalMoves } from "../performanceTracking.js";
 
 var frameSkipCount = 0;
 var waitFrames = frameSkipCount;
 var frameBufferIndex = 0;
 var planningAttempts: HTMLSpanElement;
+var globalMovesEle: HTMLSpanElement;
 
 export function lowerIndex() {
 	frameBufferIndex = Math.max(0, frameBufferIndex - 1);
@@ -26,6 +29,7 @@ export function initFrameManager(): void {
 	commentEle = document.getElementById('frameComment');
 	window.frameBufferIndex = frameBufferIndex;
 	planningAttempts = document.getElementById("planningAttempts") as HTMLSpanElement
+	globalMovesEle = document.getElementById("globalMoves") as HTMLSpanElement;
 }
 
 export function frameHandler(ts: number): void {
@@ -41,23 +45,18 @@ export function frameHandler(ts: number): void {
 	
 	if (snakeDrawBuffer.length > frameBufferIndex) {
 		planningAttempts.textContent = '' + window.attempts;
-		// const frame = snakeDrawBuffer.shift();
+		globalMovesEle.textContent = '' + globalMoves;
 		const frame = snakeDrawBuffer[frameBufferIndex];
 		if (gameActive) {
-			// console.log(gameActive);
 			frameBufferIndex++;
 
 		}
-		// if (frame[2])
-		// 	waitFrames += frameSkipCount * 30;
 		commentEle.textContent = '' + frame[2];
-		// drawSnake(frame[0].snake, frame[1], frame[2]);
 		drawSnake(...frame);
-		// lock_tick();
 
 	} else
-		snakeTickFunction();
-		// quickTick();
+		snakeTickFunction(defaultConfig);
+		// quickTick(defaultConfig);
 	
 	requestAnimationFrame(frameHandler);
 }
@@ -73,8 +72,4 @@ function drawSnake(snakeSummary: SnakeSummary, apple: Apple, c: number, _?) {
 	// Draw the apple
 	drawApple(apple);
 
-	// drawSnakeTail(snakeSummary);
-	// 	if (c > 0) {
-	// 	// Visualize behind
-	// }
 }

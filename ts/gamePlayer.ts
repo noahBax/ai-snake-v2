@@ -112,6 +112,14 @@ export function quickTick(config: Configuration) {
 		increaseMoves(keysBuffer.length);
 	}
 
+	// Check to see if we've gone above the move limit
+	if (globalMoves > MOVES_LIMIT) {
+		gameActive = false;
+
+		if (!IN_TRAINING)
+			gameRunning.innerText = 'FALSE: above move limit';
+	}
+	
 	if (!IN_TRAINING)
 		snakeDrawBuffer.push([createSnakeCopy(snakeSummary), {...appleNow}, 0]);
 }
