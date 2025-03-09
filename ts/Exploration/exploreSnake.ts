@@ -8,7 +8,6 @@ import frontNotEnclosed from "./Rules/frontNotEnclosed.js";
 import * as utility from "../utilityFunctions/utilityFunctions.js";
 import * as board from "../utilityFunctions/boardHeuristics.js";
 import { ATTEMPT_LIMIT, BOARD_HEIGHT, BOARD_WIDTH } from "../preferences.js";
-import { FamilyNode } from "./LineageManager/lineage.js";
 import findGroups from "../Board/findGroups.js";
 import { upperIndex } from "../DrawingTools/frameManager.js";
 import { snakeDrawBuffer } from "../DrawingTools/snakeDrawBuffer.js";
@@ -26,7 +25,6 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple, c
 	let winner: Expedition;
 	const expeditions: Expedition[] = [];
 	const duplicateBoard = [];
-	const familyTree = new FamilyNode(false);
 
 	const gridPackage: GridPackage = {
 		avoidance: new board.AvoidanceGrid(),
@@ -42,7 +40,6 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple, c
 		path: [],
 		utility: Infinity,
 		atApple: false,
-		lineageNode: familyTree,
 		age: 0,
 	}
 	expeditions.push(empty);
@@ -82,37 +79,19 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple, c
 				// upperIndex();
 				// snakeDrawBuffer.push([bestPath.snake, {...apple}, ruleBroken]);
 				// console.log('Fail');
-				bestPath.lineageNode.incrementDebt(3, 0.95);
 				continue;
 			}
 
 			// console.log(bestPath.path);
 			
 			winner = bestPath;
-			bestPath.lineageNode.parent = false;
-			bestPath.lineageNode.familyDebt = 0;
-			bestPath.lineageNode.cumulativeDebt = 0;
 			goalMet = true;
 			break;
 		}
 
 		gridPackage.avoidance.visitNode(bestPath.snake.snakeFront.boardSpaceNode, config);
 		
-
-		const spot = bestPath.snake.snakeFront.boardSpaceNode;
-		const spotIndex = spot.board_x + spot.board_y * BOARD_WIDTH;
-		
 		const pioneers = expandAtNode(bestPath, apple, duplicateBoard);
-		
-		// Update debt for pioneers
-		if (pioneers.length > 0)
-			bestPath.lineageNode.incrementDebt(1, 0.9, 0.15);
-		
-		// Calculate the cumulative debt
-		for (const p of pioneers)
-			p.lineageNode.calculateCumulativeDebt(1.01);
-		
-		const logLineageDebt = Math.log(bestPath.lineageNode.cumulativeDebt)
 		
 		// Calculate utility
 		for (const p of pioneers){

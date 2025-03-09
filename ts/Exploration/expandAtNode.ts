@@ -7,7 +7,6 @@ import moveSnake from "../Snake/moveSnake.js";
 import { BoardNode, DIRECTION, SnakeNode, isSnakeEnd } from "../snakeNodes.js";
 import Expedition from "./expedition.js";
 import { CompassNode, isDuplicate } from "./duplicateFinder.js";
-import { FamilyNode } from "./LineageManager/lineage.js";
 
 
 export default function expandAtNode(expedition: Expedition, apple: Apple, duplicateBoard?: CompassNode[]): Expedition[] {
@@ -81,18 +80,13 @@ function stepTowards(expedition: Expedition, frontNode: BoardNode, backNode: Boa
 	snake.snakeHead.boardSpaceNode = frontNode;
 	snake = moveSnake(snake);
 
-
 	const atApple = frontNode.board_x == apple.board_x && frontNode.board_y == apple.board_y;
-	const daughterNode = new FamilyNode(expedition.lineageNode);
-
-	expedition.lineageNode.children.push(daughterNode);
 
 	return {
 		path: path,
 		snake: snake,
 		utility: 0,
 		atApple: atApple,
-		lineageNode: daughterNode,
 		age: expedition.age+1
 	};
 }
