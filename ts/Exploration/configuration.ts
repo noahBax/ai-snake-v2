@@ -3,7 +3,6 @@ export default interface Configuration {
 	avoidanceCoolDown: number;
 	snakePathDecrement: number;
 	snakePathFalloff: number;
-	appleDistanceMultiplier: number;
 
 	utilityCurvy: number;
 	utilityCurvyLengthBack: number;
@@ -15,4 +14,9 @@ export default interface Configuration {
 	utilityStraightLengthBack: number;
 	sizeOneGroups: number;
 	largestGroupSize: number;
+
+	numGroups: number;
+	canSeeTail: number;
+	appleDirectMultiplier: number;
+	appleTaxiMultiplier: number;
 }

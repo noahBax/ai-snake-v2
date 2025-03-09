@@ -53,7 +53,7 @@ export function projection(expedition: Expedition, apple: Apple, useMin: boolean
 
 export function curvy(expedition: Expedition, config: Configuration): number {
 	
-	const lengthBack = Math.abs(Math.floor(config.utilityCurvyLengthBack));
+	const lengthBack = Math.floor(Math.abs(config.utilityCurvyLengthBack));
 	const directions = [...getSnakeInstructions(expedition.snake)];
 	
 	let turnPenalty = 0;
@@ -78,7 +78,7 @@ export function curvy(expedition: Expedition, config: Configuration): number {
 
 export function straight(expedition: Expedition, config: Configuration): number {
 	
-	const lengthBack = Math.abs(Math.floor(config.utilityStraightLengthBack));
+	const lengthBack = Math.floor(Math.abs(config.utilityStraightLengthBack));
 	const directions = [...getSnakeInstructions(expedition.snake)];
 	
 	let turnBonus = 0;

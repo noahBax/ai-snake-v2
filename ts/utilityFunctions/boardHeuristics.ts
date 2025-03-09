@@ -3,15 +3,11 @@ import Configuration from "../Exploration/configuration.js";
 import { BOARD_HEIGHT, BOARD_WIDTH } from "../preferences.js";
 import { BoardNode, GridSpot, isSnakeEnd, SnakeNode, SnakeSummary } from "../snakeNodes.js";
 
-abstract class InteractiveGrid {
-	abstract getValue(boardNode: GridSpot): number;
-}
 
-export class AvoidanceGrid extends InteractiveGrid {
+export class AvoidanceGrid {
 	nodeHistory: number[];
 	
 	constructor() {
-		super();
 		this.nodeHistory = createEmptyGrid();
 	}
 
@@ -29,7 +25,7 @@ export class AvoidanceGrid extends InteractiveGrid {
 	coolDown(config: Configuration): void {
 
 		for (let i = 0; i < this.nodeHistory.length; i++) {
-			this.nodeHistory[i] -= config.avoidanceCoolDown;	
+			this.nodeHistory[i] -= Math.abs(config.avoidanceCoolDown);	
 			if (this.nodeHistory[i] < 0) {
 				this.nodeHistory[i] = 0;
 			}
@@ -38,12 +34,11 @@ export class AvoidanceGrid extends InteractiveGrid {
 	}
 }
 
-export class SnakePathGrid extends InteractiveGrid {
+export class SnakePathGrid {
 
 	nodeBonuses: number[];
 
 	constructor(snakeSummary: SnakeSummary, config: Configuration) {
-		super();
 
 		this.nodeBonuses = createEmptyGrid();
 
@@ -73,29 +68,43 @@ export class SnakePathGrid extends InteractiveGrid {
 	}
 }
 
-export class AppleDistanceGrid extends InteractiveGrid {
+export class AppleDistanceGrid {
 
-	nodeDistances: number[];
+	readonly nodeTaxiDistances: number[];
+	readonly nodeDirectDistances: number[];
 
-	constructor(apple: Apple, config: Configuration) {
-		super();
-		this.nodeDistances = createEmptyGrid();
+	constructor(apple: Apple) {
+		this.nodeDirectDistances = createEmptyGrid();
+		this.nodeTaxiDistances = createEmptyGrid();
 
 		// Fill in grid with taxi distances from the apple
-		for (let i = 0; i < this.nodeDistances.length; i++) {
+		for (let i = 0; i < this.nodeTaxiDistances.length; i++) {
 			
 			const gridSpot = getGridSpot(i);
 			const distance = Math.abs(gridSpot.board_x - apple.board_x) + Math.abs(gridSpot.board_y - apple.board_y)
 			
-			// this.nodeDistances[i] = distance - (BOARD_WIDTH+BOARD_HEIGHT)/2;
-			this.nodeDistances[i] = distance * config.appleDistanceMultiplier;
+			this.nodeTaxiDistances[i] = distance;
+		}
+
+		// Fill in grid with direct distances from the apple
+		for (let i = 0; i < this.nodeDirectDistances.length; i++) {
+			
+			const gridSpot = getGridSpot(i);
+			const distance = Math.sqrt((gridSpot.board_x - apple.board_x)**2 + (gridSpot.board_y - apple.board_y)**2)
+			
+			this.nodeDirectDistances[i] = distance;
 		}
 
 	}
 	
-	getValue(gridSpot: GridSpot): number {
+	getDirect(gridSpot: GridSpot): number {
 		const index = getIndex(gridSpot);
-		return this.nodeDistances[index];
+		return this.nodeDirectDistances[index];
+	}
+
+	getTaxi(gridSpot: GridSpot): number {
+		const index = getIndex(gridSpot);
+		return this.nodeTaxiDistances[index];
 	}
 }
 

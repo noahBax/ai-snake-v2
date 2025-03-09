@@ -40,6 +40,16 @@ export default function findGroups(snakeSummary: SnakeSummary): BoardNode[][] {
 
 		groups.push(group);
 	}
+
+	// Exclude a group if it is of size 1 and the snake head is the only
+	// occupant
+	for (let i = 0; i < groups.length; i++) {
+		if (groups[i].length == 1 && groups[i][0] == snakeSummary.snakeHead.boardSpaceNode) {
+			// Get rid of it
+			groups.splice(i, 1);
+			break;
+		}
+	}
 	
 	return groups;
 }

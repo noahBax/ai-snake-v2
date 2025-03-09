@@ -14,7 +14,6 @@ function main(): void {
 		"avoidanceCoolDown",
 		"snakePathDecrement",
 		"snakePathFalloff",
-		"appleDistanceMultiplier",
 		"utilityCurvyLengthBack",
 		"utilityCurvyStraightLength",
 		"utilityCurvyTurnPenaltyDefault",
@@ -25,13 +24,16 @@ function main(): void {
 		"utilityCurvy",
 		"largestGroupSize",
 		"utilityStraight",
+		"numGroups",
+		"canSeeTail",
+		"appleDirectMultiplier",
+		"appleTaxiMultiplier",
 	]
 	const config: Configuration = {
 		avoidanceVisitPenalty: 0,
 		avoidanceCoolDown: 0,
 		snakePathDecrement: 0,
 		snakePathFalloff: 0,
-		appleDistanceMultiplier: 0,
 		utilityCurvy: 0,
 		utilityCurvyLengthBack: 0,
 		utilityCurvyStraightLength: 0,
@@ -41,7 +43,11 @@ function main(): void {
 		utilityStraightTurnBonusDivisor: 0,
 		utilityStraightLengthBack: 0,
 		sizeOneGroups: 0,
-		largestGroupSize: 0
+		largestGroupSize: 0,
+		numGroups: 0,
+		canSeeTail: 0,
+		appleDirectMultiplier: 0,
+		appleTaxiMultiplier: 0,
 	};
 
 	// Assign the keys

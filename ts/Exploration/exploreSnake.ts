@@ -31,7 +31,7 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple, c
 	const gridPackage: GridPackage = {
 		avoidance: new board.AvoidanceGrid(),
 		snakeGrid: new board.SnakePathGrid(snakeSummary, config),
-		appleGrid: new board.AppleDistanceGrid(apple, config),
+		appleGrid: new board.AppleDistanceGrid(apple),
 	}
 
 	// console.log(gridPackage);
@@ -121,37 +121,15 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple, c
 
 			p.utility   = 0
 						+ utility.curvy(p, config) * config.utilityCurvy
-						- Math.sqrt(smallGroups[0]?.length ?? 0) * config.largestGroupSize // largest group
-						// + smallGroups.length ** 2
-						// + Math.sqrt((smallGroups.at(-1)?.length ?? 0))
-						// + Math.sqrt(p.path.length)
-						// + smallGroups.length * 2;
-						+ sizeOneGroups * config.sizeOneGroups;
-						- utility.straight(p, config) * config.utilityStraight
-						// + logLineageDebt
-						// + utility.turnCount(p) / distanceEffect * logLineageDebt
-						// + utility.turnCount(p)
-						// + Math.log(utility.direct(p, apple))
-						// + logLineageDebt **2 / 10122 * 0.001 * utility.direct(p, apple) 
-						// + utility.taxi(p, apple) ** 2 * logLineageDebt
-						// + utility.taxi(p, apple)
-						// + utility.taxi(p, apple) * utility.distToTail(p) * Math.sqrt(p.path.length) / 50
-						// + utility.taxi(p, apple) * 2
-						// + utility.curvy(p, apple)
-						// - utility.turnCount(p) * (1-1/logLineageDebt)
-						// + Math.log2(p.lineageNode.cumulativeDebt)
-						// + Math.sqrt(utility.distToTail(p)) / 2;
-						// + utility.distToTail(p) * (1 - 1/p.lineageNode.cumulativeDebt) / utility.turnCount(p)
-						// + utility.distToTail(p)
-						// + utility.straight(p, apple) * distanceEffect
-						// + curvyScore * (1 - 1/p.lineageNode.cumulativeDebt)
-						// - utility.straight(p, apple) / 10 * logLineageDebt / distanceEffect / 2
-						// + utility.projection(p, apple, false) / logLineageDebt ** 2
-						// + utility.projection(p, apple, false) ** 2
-						// - (utility.direct(p, apple) == 0 ? 500 : 0)
-						// + Math.max(logLineageDebt - utility.taxi(p, apple), 0)
+						+ Math.sqrt(smallGroups[0]?.length ?? 0) * config.largestGroupSize // Largest group
+						+ smallGroups.length * config.numGroups // Number of groups
+						+ (frontCanSeeSnakeTail(p) ? 1 : 0) * config.canSeeTail // Can see tail weight
+						+ sizeOneGroups * config.sizeOneGroups; // Number of size one groups
+						+ utility.straight(p, config) * config.utilityStraight
+						+ gridPackage.appleGrid.getDirect(p.snake.snakeFront.boardSpaceNode) * config.appleDirectMultiplier
+						+ gridPackage.appleGrid.getTaxi(p.snake.snakeFront.boardSpaceNode) * config.appleTaxiMultiplier
+						+ gridPackage.snakeGrid.getValue(p.snake.snakeFront.boardSpaceNode)
 						;
-						// - utility.distToTail(p) * Math.log(p.lineageNode.cumulativeDebt) / 5 * Math.sin(p.lineageNode.cumulativeDebt/4);
 
 		}
 		
@@ -201,9 +179,7 @@ function comparePaths(path1: Expedition, path2: Expedition, gridPackage: GridPac
 }
 
 function findBoardHeuristicSum(spot: GridSpot, gridPackage: GridPackage) {
-	return  gridPackage.avoidance.getValue(spot)
-			+ gridPackage.snakeGrid.getValue(spot)
-			+ gridPackage.appleGrid.getValue(spot);
+	return gridPackage.avoidance.getValue(spot);
 }
 
 interface GridPackage {

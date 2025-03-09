@@ -5,8 +5,8 @@ export const VISUALIZE_FAILED_ATTEMPTS = true;
 export const BOARD_WIDTH  = 20;
 export const BOARD_HEIGHT = 20;
 export const DRAW_NODE_SIZE = 40;
-export const ATTEMPT_LIMIT = 2000;
-export const MOVES_LIMIT = 28900
+export const ATTEMPT_LIMIT = 3500;
+export const MOVES_LIMIT = 33000
 
 const myConfig: Configuration = {
 	avoidanceVisitPenalty: 3,
@@ -227,5 +227,43 @@ const config20x20New: Configuration = {
 	largestGroupSize: 0.28944948,
 	utilityStraight: 1.47237123,
 }
+const config20x20NewNew: Configuration = {
+	avoidanceVisitPenalty: 1.49086075,
+	avoidanceCoolDown: -1.82517107,
+	snakePathDecrement: -0.28992209,
+	snakePathFalloff: -0.10198221,
+	appleDistanceMultiplier: 0.22957347,
+	utilityCurvyLengthBack: -1.27025663,
+	utilityCurvyStraightLength: 0.17348637,
+	utilityCurvyTurnPenaltyDefault: -0.21628988,
+	utilityStraightStraightLength: 1.19201287,
+	utilityStraightTurnBonusDivisor: 0.32350997,
+	utilityStraightLengthBack: -0.35172586,
+	sizeOneGroups: 0.74502754,
+	utilityCurvy: -1.26572724,
+	largestGroupSize: 1.77932753,
+	utilityStraight: 0.6420258,
+}
+/**
+ * Something I notice (I'll change it in V2) is that having a negative avoidance
+ * cooldown makes that cooldown useless
+ */
+const config20x20NewNewNew: Configuration = {
+	avoidanceVisitPenalty: 3.11702137,
+	avoidanceCoolDown: -1.76888545,
+	snakePathDecrement: 0.06952141,
+	snakePathFalloff: -0.40129675,
+	appleDistanceMultiplier: 0.06940655,
+	utilityCurvyLengthBack: -1.33187313,
+	utilityCurvyStraightLength: -3.00633197,
+	utilityCurvyTurnPenaltyDefault: 0.68169815,
+	utilityStraightStraightLength: 1.14101156,
+	utilityStraightTurnBonusDivisor: 1.02668129,
+	utilityStraightLengthBack: -2.52211503,
+	sizeOneGroups: 0.5741448,
+	utilityCurvy: -0.13925989,
+	largestGroupSize: 0.94999403,
+	utilityStraight: -0.23790775,
+}
 
-export const defaultConfig: Configuration = config20x20New;
+export const defaultConfig: Configuration = config20x20NewNewNew;
