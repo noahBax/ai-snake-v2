@@ -7,6 +7,7 @@ import moveSnake from "../Snake/moveSnake.js";
 import { BoardNode, DIRECTION, SnakeNode, isSnakeEnd } from "../snakeNodes.js";
 import Expedition from "./expedition.js";
 import { CompassNode, isDuplicate } from "./duplicateFinder.js";
+import { shuffle } from "../randomizer.js";
 
 
 export default function expandAtNode(expedition: Expedition, apple: Apple, duplicateBoard?: CompassNode[]): Expedition[] {
@@ -20,6 +21,8 @@ export default function expandAtNode(expedition: Expedition, apple: Apple, dupli
 		accessNodeRelation(front, DIRECTION.south),
 		accessNodeRelation(front, DIRECTION.west),
 	];
+
+	shuffle(possibleSpots);
 
 	const validDirections = possibleSpots.filter(d => d != EMPTY_NODE);
 

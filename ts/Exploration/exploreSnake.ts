@@ -16,6 +16,7 @@ import groupLimit from "./Rules/groupLimit.js";
 import { IN_TRAINING } from "../trainingModule.js";
 import { incrementAttempts } from "../performanceTracking.js";
 import Configuration from "./configuration.js";
+import { shuffle } from "../randomizer.js";
 
 export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple, config: Configuration): Expedition {
 
@@ -60,6 +61,9 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple, c
 
 		gridPackage.avoidance.coolDown(config);
 		
+		// Shuffle the expeditions so that the agent knows nothing about the board
+		shuffle(expeditions);
+
 		// Take the highest man off the stack
 		const bestPath = expeditions.reduce((a,b) => comparePaths(a, b, gridPackage));
 		expeditions.splice(expeditions.indexOf(bestPath), 1);
