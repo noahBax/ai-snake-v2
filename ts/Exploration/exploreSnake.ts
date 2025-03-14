@@ -70,8 +70,10 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple, c
 
 		findBoardRelation(bestPath.snake.snakeFront.boardSpaceNode, bestPath.snake.snakeFront.tailBoundNode.boardSpaceNode);
 
-		// upperIndex();
-		// snakeDrawBuffer.push([bestPath.snake, {...apple}, -1, bestPath.path]);
+		if (!IN_TRAINING) {
+			// upperIndex();
+			// snakeDrawBuffer.push([bestPath.snake, {...apple}, -1, bestPath.path]);
+		}
 		
 		// Check to see if the path with the best utility has reached the apple
 		if (bestPath.atApple) {
