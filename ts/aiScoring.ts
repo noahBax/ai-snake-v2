@@ -2,8 +2,8 @@ export var AI_SCORE = 0;
 
 function calculateUtility(x: number): number {
 
-	if (x <= 40)
-		return 40 - (x ** 2) / 40;
+	if (x <= 400)
+		return 400 - (x ** 2) / 400;
 
 	else
 		return 0;
