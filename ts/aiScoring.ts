@@ -1,5 +1,3 @@
-import { globalProgress } from "./performanceTracking.js";
-
 export var AI_SCORE = 0;
 
 function calculateUtility(x: number): number {
@@ -12,6 +10,5 @@ function calculateUtility(x: number): number {
 }
 
 export function tallyScore(moves: number): void {
-	AI_SCORE -= moves;
-	AI_SCORE += globalProgress
+	AI_SCORE += calculateUtility(moves);
 }
