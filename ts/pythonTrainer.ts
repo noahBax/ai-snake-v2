@@ -28,7 +28,6 @@ function main(): void {
 		"utilityStraight",
 		"numGroups",
 		"canSeeTail",
-		"appleDirectMultiplier",
 		"appleTaxiMultiplier",
 	]
 	const config: Configuration = {
@@ -48,7 +47,6 @@ function main(): void {
 		largestGroupSize: 0,
 		numGroups: 0,
 		canSeeTail: 0,
-		appleDirectMultiplier: 0,
 		appleTaxiMultiplier: 0,
 	};
 

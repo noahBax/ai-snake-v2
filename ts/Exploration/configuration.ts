@@ -17,6 +17,5 @@ export default interface Configuration {
 
 	numGroups: number;
 	canSeeTail: number;
-	appleDirectMultiplier: number;
 	appleTaxiMultiplier: number;
 }
