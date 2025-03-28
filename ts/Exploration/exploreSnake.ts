@@ -111,7 +111,8 @@ export default function exploreSnake(snakeSummary: SnakeSummary, apple: Apple, c
 						+ (frontCanSeeSnakeTail(p) ? 1 : 0) * config.canSeeTail // Can see tail weight
 						+ sizeOneGroups * config.sizeOneGroups; // Number of size one groups
 						+ utility.straight(p, config) * config.utilityStraight
-						+ gridPackage.appleGrid.getTaxi(p.snake.snakeFront.boardSpaceNode) * (-Math.abs(config.appleTaxiMultiplier))
+						+ gridPackage.appleGrid.getDirect(p.snake.snakeFront.boardSpaceNode) * config.appleDirectMultiplier
+						+ gridPackage.appleGrid.getTaxi(p.snake.snakeFront.boardSpaceNode) * config.appleTaxiMultiplier
 						+ gridPackage.snakeGrid.getValue(p.snake.snakeFront.boardSpaceNode)
 						;
 

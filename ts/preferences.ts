@@ -283,7 +283,7 @@ const DumbFrickinSnake: Configuration = {
 	utilityStraight: -1.04408936,
 	numGroups: 2.36489483,
 	canSeeTail: 0.10500985,
-	// appleDirectMultiplier: -1.05078949,
+	appleDirectMultiplier: -1.05078949,
 	appleTaxiMultiplier: 2.16914237,
 }
 
@@ -304,6 +304,7 @@ const configV2: Configuration = {
 	utilityStraight: -1.04408936,
 	numGroups: 2.36489483,
 	canSeeTail: 0.10500985,
+	appleDirectMultiplier: -1.05078949,
 	appleTaxiMultiplier: 2.16914237,
 }
 
