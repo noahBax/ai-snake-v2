@@ -2,3 +2,6 @@
 js
 .vscode
 node_modules
+# Nohup files
+*.out
+tsconfig.tsbuildinfo
